@@ -1,0 +1,1142 @@
+﻿Centro Universitario Regional de Chontales
+“Cornelio Silva Argüello”
+
+
+“2026: Por una Educación al Servicio del Pueblo, ¡Viva Sandino!”
+
+
+“ Aplicación móvil para la gestión de horarios académicos de la UNAN-Managua, CUR-Chontales.”
+
+
+                
+Autores
+* Denis Oneyker Castillo Galeano.
+* Gisela Paola Rocha Cruz.
+* Darikson Sneyder Castilla Velazquez.
+
+
+
+
+                        Docentes/Componentes
+* Dionicio Manzanares Lopez
+
+
+
+
+        Fecha: 27/07/2026
+
+
+
+
+
+
+
+
+  
+¡Universidad del Pueblo y para el Pueblo! 
+________________
+Líneas de Investigación
+
+
+Aplicación móvil para la gestión de horarios académicos de la UNAN-Managua, CUR-Chontales
+
+
+1. Línea institucional: IIC-1: Innovación, Tecnología y Medio Ambiente de la UNAN-Managua.
+2. Línea 36: Emprendimiento científico tecnológico del SEN 2025-2027.
+3. Clasificación internacional Normalizada de la Educación 2013 (CINE 13)
+4. Línea Tecnologías de la información y la Comunicación (TIC)
+
+
+Autores
+
+
+Denis Oneyker Castillo Galeano
+0009-0004-4085-0111
+oneygaleano21@gmail.com
+
+
+Gisela Paola Rocha Cruz
+0009-0004-7149-6549
+cruzrochagisela@gmai.com
+
+
+Darikson Sneyder Castilla Velazquez
+0009-0009-0392-3891
+darikcas13@gmail.com
+________________
+Resumen ejecutivo
+[Espacio reservado para el resumen ejecutivo]
+Glosario técnico
+[Espacio reservado para el glosario técnico]
+________________
+
+
+Índice
+
+
+3. Nombre del proyecto        5
+4. Tema general y específico        5
+Tema General        5
+Tema Específico        5
+5. Objetivos General y Específicos        5
+Objetivo General        5
+Objetivos Específicos        5
+6. Alcances y limitaciones del proyecto        7
+Alcances        7
+Limitaciones        8
+7. Justificación        9
+8. Inventario de recursos        10
+9. Requisitos, supuestos y restricciones        10
+Riesgos y contingencias        11
+10. Tecnologías        12
+Bibliografías        14
+
+
+________________
+
+
+1. Introducción
+La planificación de los horarios académicos en la UNAN-Managua, CUR-Chontales constituye un proceso fundamental para el adecuado funcionamiento de las instituciones de educación superior, debido a que requiere coordinar diferentes elementos como docentes, asignaturas, aulas, secciones y períodos de clase. Cuando este proceso se realiza de manera manual o mediante herramientas que no están integradas, puede generar dificultades en la organización de la información, duplicando datos, completos de horarios y retrasos en la consulta de la programación académica.
+En la UNAN- Managua, CUR-Chontales, la organización de los horarios académicos requiere considerar la disponibilidad de docentes, que se imparten en el centro universitario. Ante esta necesidad, resulta conveniente disponer de herramientas tecnológicas que faciliten el acceso a la información y permitan a los docentes consultar de manera rápida y organizada la programación asignada.
+Como respuesta a esta situación, se propone el desarrollo de una aplicación móvil orientada a la consulta de horarios académicos, que permita a los docentes acceder desde dispositivos móviles a información relacionada con sus asignaturas, aulas, secciones y períodos de clase. La aplicación busca centralizar la información y facilitar su consulta, reduciendo la dependencia de documentos impresos o archivos distribuidos por diferentes medios.
+El proyecto será desarrollado durante las prácticas profesionales mediante un enfoque de trabajo basado en metodologías ágiles, organizando las funcionalidades en historias de usuario, Product Backlog y Sprint Backlog. Para su construcción se emplearán tecnologías de desarrollo móvil y servicios de almacenamiento de datos que permitan obtener una solución funcional, accesible y adaptable a las necesidades identificadas en el entorno universitario.  
+________________
+
+
+2. Planteamiento del problema
+3. Nombre del proyecto
+Aplicación móvil para la consulta y gestión de horarios académicos del CUR-Chontales. 
+
+
+4. Tema general y específico
+Tema General
+Desarrollo de aplicaciones móviles para la gestión de información académica en instituciones de educación superior. 
+Tema Específico
+Desarrollo de una aplicación móvil para facilitar la consulta y organización de horarios académicos de docentes en la UNAN-Managua, CUR-Chontales. 
+
+
+5. Objetivos del proyecto
+Objetivo General
+Desarrollar una aplicación móvil para facilitar la consulta y organización de los horarios académicos de los docentes de la UNAN-Managua, CUR-Chontales, mediante el uso de tecnologías de desarrollo móvil, servicios de almacenamiento de datos y una metodología ágil que permita estructurar progresivamente las funcionalidades del sistema. 
+Objetivos Específicos
+* Identificar el proceso actual de organización y consulta de horarios académicos, identificando las necesidades de información de los docentes y los elementos involucrados en la programación.
+* Programar las funcionalidades de la aplicación móvil para la consulta de horarios, asignaturas, aulas, secciones y períodos de clase, utilizando tecnologías de desarrollo móvil multiplataforma.
+* Integrar un sistema de almacenamiento de datos y mecanismos de autenticación que permitan centralizar, gestionar y proteger la información relacionada con docentes, asignaturas, aulas, secciones y horarios académicos.
+* Incorporar un componente de inteligencia artificial que analice las restricciones y condiciones de la planificación académica para generar propuestas de distribución de secciones, aulas y períodos de clase, contribuyendo a disminuir posibles conflictos en la asignación. 
+* Validar las funcionalidades desarrolladas durante los Sprint mediante pruebas que permitan verificar el correcto funcionamiento de la aplicación y del componente de inteligencia artificial de acuerdo con los requerimientos establecidos.
+________________
+
+
+
+
+
+
+6. Alcances y limitaciones del proyecto
+Alcances
+El proyecto contempla el desarrollo de una aplicación móvil orientada principalmente a docentes de la UNAN-Managua, CUR-Chontales, con el propósito de facilitar la consulta de la programación académica desde dispositivos móviles.
+La aplicación permitirá:
+* Autenticar a los usuarios para acceder a las funcionalidades correspondientes.
+* Consultar el horario académico asignado a cada docente.
+* Visualizar información de las asignaturas correspondientes.
+* Consultar las aulas asignadas para cada período de clase.
+* Identificar las secciones asociadas a las asignaturas.
+* Visualizar los días y horas correspondientes a cada actividad académica.
+* Centralizar la información necesaria para la consulta de los horarios.
+* Presentar la información mediante una interfaz adaptada a dispositivos móviles.
+* Facilitar la actualización de la información cuando se realicen modificaciones en los horarios desde el sistema encargado de su gestión.
+* Organizar las funcionalidades mediante un desarrollo incremental basado en Sprint.
+________________
+
+
+
+
+
+
+Limitaciones
+El proyecto estará limitado a las necesidades de consulta de horarios académicos de la UNAN-Managua, CUR-Chontales. La aplicación no contempla:
+* Gestión de matrículas estudiantiles.
+* Registro o modificación de calificaciones.
+* Control de asistencia de estudiantes.
+* Gestión de expedientes académicos.
+* Procesos financieros o administrativos de la universidad.
+* Sustitución de los sistemas institucionales existentes.
+* Gestión completa de la planificación académica desde la aplicación móvil.
+* Acceso público a la información de horarios sin autenticación.
+* Administración general de usuarios fuera de los roles definidos para el proyecto.
+La aplicación dependerá de la disponibilidad de conexión a Internet para consultar la información almacenada en los servicios utilizados por el sistema. Asimismo, las funcionalidades estarán condicionadas por la información proporcionada por los responsables de la planificación académica.
+
+
+________________
+7. Justificación del proyecto
+La planificación de horarios académicos requiere coordinar diferentes elementos, entre ellos docentes, asignaturas, aulas, secciones, días y períodos de clase. La consulta de esta información puede resultar poco práctica cuando se encuentra distribuida en documentos físicos, archivos digitales o diferentes medios de comunicación. Esta situación puede dificultar que los docentes conozcan oportunamente la programación correspondiente y puede generar confusiones cuando se realizan modificaciones.
+Por esta razón, se propone el desarrollo de una aplicación móvil que permita centralizar y facilitar la consulta de los horarios académicos de los docentes de la UNAN-Managua, CUR-Chontales. El acceso desde dispositivos móviles permitirá disponer de la información de manera más rápida y organizada, reduciendo la dependencia de documentos impresos y facilitando la consulta desde diferentes lugares.
+El desarrollo de esta solución también permitirá aplicar conocimientos adquiridos durante la formación profesional en áreas como desarrollo de aplicaciones móviles, bases de datos, gestión de usuarios y metodologías ágiles. Además, el proyecto proporcionará una alternativa tecnológica que puede contribuir a mejorar el acceso a la información relacionada con la programación académica y servir como base para futuras ampliaciones del sistema.
+Desde el punto de vista institucional, la aplicación puede contribuir a mejorar la disponibilidad y organización de la información para los docentes, mientras que desde el ámbito académico y profesional permitirá poner en práctica competencias de análisis, programación, diseño de bases de datos, desarrollo móvil y gestión de proyectos de software.
+
+
+________________
+
+
+
+
+8. Inventario de recursos
+* Recursos humanos
+   * desarrolladores.
+   * Tutor del proyecto.
+   * Usuarios de prueba (personal administrativo).
+* Recursos de hardware
+   * Computadoras para desarrollo.
+   * Dispositivos móviles Android e iOS para pruebas.
+   * Conexión a Internet.
+* Recursos de software
+   * Visual Studio Code.
+   * Node.js.
+   * React.
+   * Vite.
+   * Express.js.
+   * MySQL.
+   * Git y GitHub.
+   * Navegador web.
+   * Servicio/API de Inteligencia Artificial
+9. Requisitos, supuestos y restricciones
+Requisitos
+* Acceso a Internet.
+* Dispositivo móvil compatible (Android o iOS).
+* Base de datos MySQL.
+* Backend disponible.
+* API de IA configurada.
+* Usuarios autenticados.
+Supuestos
+* El personal administrativo proporcionará información correcta.
+* Los horarios, docentes y aulas estarán previamente registrados.
+* La API de IA estará disponible durante las pruebas.
+
+
+Restricciones
+* El sistema será exclusivo para la UNAN-Managua, CUR-Chontales.
+* La IA funcionará únicamente como apoyo para la planificación.
+* No administra matrículas ni calificaciones.
+* El proyecto se desarrollará dentro del tiempo establecido.
+
+
+
+
+Riesgos y contingencias
+
+
+
+
+Riesgo
+	Contingencia
+	Caída del servidor
+	Restaurar el servicio y respaldos.
+	Error en la base de datos
+	Restaurar copia de seguridad.
+	Cambios de requerimientos
+	Planificar el Sprint correspondiente.
+	Indisponibilidad de la API de IA
+	Mostrar un mensaje al usuario y permitir continuar con la planificación manual.
+	Retrasos del equipo
+	Redistribuir tareas según SCRUM.
+	Datos incorrectos
+	Implementar validaciones antes de guardar la información.
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+________________
+
+
+
+
+10. Tecnologías
+
+
+Tecnología
+	Función
+	Justificación
+	
+
+	
+
+	
+
+	Vite
+	Compilación
+	Mejora el rendimiento durante el desarrollo.
+	Node.js
+	Backend
+	Ejecuta el servidor de la aplicación.
+	Express.js
+	API REST
+	Facilita la comunicación entre la App Móvil y la base de datos.
+	MySQL
+	Base de datos
+	Almacena la información académica.
+	React Native
+	Framework de App Móvil
+	Permite desarrollar la aplicación para iOS y Android con un solo código base.
+	Expo
+	Ecosistema de desarrollo
+	Facilita el despliegue y las pruebas de la aplicación en dispositivos reales.
+	API de IA
+	Inteligencia Artificial
+	Genera recomendaciones para optimizar la planificación de horarios y apoyar la toma de decisiones.
+	
+
+Desarrollo
+Acta de constitución
+Información general
+Descripción del producto o servicio
+Fases del proyecto
+Stakeholders claves
+Beneficios esperados
+Integrantes del proyecto – roles y responsabilidades
+Modelo de requerimiento
+Nivel de negocio
+Nivel de análisis de datos
+Métodos de recolección de datos
+Modelo de análisis
+Diseño del Esquema de BD
+________________
+Modelo conceptual
+
+
+  Modelo lógico
+________________
+  Modelo físico
+
+
+
+
+  
+
+  
+  
+  
+
+
+
+
+
+
+
+
+
+
+
+________________
+
+
+Historias de usuarios y criterios de aceptación
+
+
+
+
+H01-Inicio de sesión y autenticación
+	COMO:
+	Usuario registrado
+	QUIERO:
+	Iniciar sesión con mi correo institucional y contraseña.
+	PARA:
+	Acceder a las funciones autorizadas para mi rol.
+	Validación
+	CA1. Con credenciales válidas y una cuenta activa, se abre el panel correspondiente al rol del usuario.
+CA2. Con credenciales inválidas o cuenta inactiva, se deniega el acceso con un mensaje genérico.
+CA3. Un docente no puede acceder a funciones administrativas, aunque intente entrar directamente.
+	Impacto
+	30
+	Prioridad
+	5
+	Estimación
+	12 hrs
+	
+
+H02-Recuperación de contraseña
+	COMO:
+	Usuario registrado
+	QUIERO:
+	Restablecer mi contraseña mediante mi correo institucional.
+	PARA:
+	Recuperar el acceso a mi cuenta.
+	Validación
+	CA1. La solicitud muestra el mismo mensaje exista o no el correo; solo envía el enlace si corresponde a una cuenta activa.
+CA2. El enlace vence a los 30 minutos, se utiliza una sola vez y se rechaza si es inválido o ya fue usado.
+CA3. La nueva contraseña debe cumplir la política acordada; después del cambio, la anterior deja de permitir el acceso.
+	Impacto
+	20
+	Prioridad
+	4
+	Estimación
+	16 hrs
+	________________
+
+
+
+
+H03-Gestión de cuentas y roles
+	COMO:
+	Administrador
+	QUIERO:
+	Crear, editar y desactivar cuentas con rol de docente o administrador.
+	PARA:
+	Mantener el acceso del personal autorizado.
+	Validación
+	CA1. Se registran nombre, correo institucional, cédula y rol; se rechazan campos obligatorios vacíos y correos duplicados.
+CA2. Los cambios de rol se aplican a los permisos del usuario; una cuenta inactiva no puede realizar nuevas operaciones autenticadas.
+CA3. La desactivación conserva las asignaciones históricas y se impide desactivar al último administrador activo.
+	Impacto
+	25
+	Prioridad
+	4
+	Estimación
+	16 hrs
+	
+
+
+
+H04-Consulta del horario semanal
+	COMO:
+	Docente
+	QUIERO:
+	Consultar mi horario semanal del período académico activo.
+	PARA:
+	Identificar los días y horas de mis clases.
+	Validación
+	CA1. La vista semanal muestra únicamente las clases publicadas del docente autenticado, con día y horas de inicio y fin.
+CA2. Se identifica el período activo y se permite consultar los días de lunes a domingo.
+CA3. Si no hay clases publicadas, se muestra un mensaje; un error de conexión se identifica por separado.
+	Impacto
+	30
+	Prioridad
+	5
+	Estimación
+	24 hrs
+	________________
+
+
+
+
+H05-Detalle de asignaturas y secciones
+	COMO:
+	Docente
+	QUIERO:
+	Consultar el detalle de una clase de mi horario.
+	PARA:
+	Identificar su asignatura, sección, carrera y período académico.
+	Validación
+	CA1. Al seleccionar una clase propia, se muestran nombre y código de asignatura, sección, carrera y año de estudio.
+CA2. Se muestran por separado el período académico y el año lectivo de la clase seleccionada.
+CA3. Los datos corresponden a la versión publicada; no se permite consultar un detalle ajeno sin autorización.
+	Impacto
+	24
+	Prioridad
+	5
+	Estimación
+	8 hrs
+	
+
+H06-Consulta del aula y pabellón
+	COMO:
+	Docente
+	QUIERO:
+	Consultar el aula y el pabellón de cada clase.
+	PARA:
+	Ubicar el espacio donde debo impartirla.
+	Validación
+	CA1. El resumen y el detalle de cada clase muestran el código del aula y su pabellón.
+CA2. La ubicación coincide con la asignación publicada y cambia cuando se consulta una nueva versión publicada.
+CA3. No se permite publicar una clase presencial sin aula válida asignada.
+	Impacto
+	28
+	Prioridad
+	5
+	Estimación
+	8 hrs
+	________________
+
+
+
+
+H07-Notificaciones de cambios publicados
+	COMO:
+	Docente
+	QUIERO:
+	Recibir una notificación cuando se publique un cambio que afecte mi horario.
+	PARA:
+	Conocer las modificaciones de mis clases.
+	Validación
+	CA1. Al publicar una modificación, se solicita el envío a los docentes afectados indicando el cambio y la clase correspondiente.
+CA2. Con permiso de notificaciones y conectividad, al abrir la notificación se consulta el horario publicado actualizado.
+CA3. Los cambios de borrador no generan alertas; si falla el envío, se registra el fallo y la consulta del horario sigue disponible.
+	Impacto
+	26
+	Prioridad
+	3
+	Estimación
+	20 hrs
+	
+
+H08-Consulta del horario sin conexión
+	COMO:
+	Docente
+	QUIERO:
+	Consultar la última copia guardada de mi horario sin conexión.
+	PARA:
+	Ver mis clases cuando no disponga de Internet.
+	Validación
+	CA1. Después de una consulta y sincronización correctas, se guarda una copia del horario del usuario autenticado.
+CA2. Sin conexión se muestra la copia con la fecha de actualización y un aviso de que puede estar desactualizada; si no existe, se informa.
+CA3. Al recuperar la conexión se actualiza la copia; al cerrar sesión se elimina y no se muestra a otro usuario.
+	Impacto
+	28
+	Prioridad
+	4
+	Estimación
+	16 hrs
+	________________
+
+
+
+
+H09-Importación de datos de docentes
+	COMO:
+	Administrador
+	QUIERO:
+	Importar datos de docentes desde una plantilla CSV o XLSX.
+	PARA:
+	Reducir el registro manual de información del personal.
+	Validación
+	CA1. Se aceptan CSV y XLSX con las columnas nombre, correo institucional, cédula y especialidad; se rechaza una estructura inválida.
+CA2. Se validan campos obligatorios y duplicados por correo o cédula; se importan las filas válidas y se omiten las inválidas.
+CA3. El resultado muestra cantidades importadas y rechazadas, con fila y motivo del error; no crea cuentas activas automáticamente.
+	Impacto
+	22
+	Prioridad
+	3
+	Estimación
+	16 hrs
+	
+
+H10-Gestión de asignaturas
+	COMO:
+	Administrador
+	QUIERO:
+	Registrar, actualizar y consultar las asignaturas y sus horas teóricas y prácticas.
+	PARA:
+	Disponer de la oferta académica para organizar los horarios.
+	Validación
+	CA1. Se registran código, nombre, carrera, año de estudio y horas teóricas y prácticas; las horas no pueden ser negativas.
+CA2. Se rechazan códigos duplicados y se permite buscar y filtrar por carrera y año de estudio.
+CA3. Una asignatura vinculada a un horario no se elimina; su desactivación impide nuevas asignaciones y conserva el historial.
+	Impacto
+	20
+	Prioridad
+	3
+	Estimación
+	12 hrs
+	________________
+
+
+H11-Gestión de aulas y capacidad
+	COMO:
+	Administrador
+	QUIERO:
+	Registrar y actualizar las aulas, su capacidad y sus recursos.
+	PARA:
+	Asignar espacios adecuados a las secciones.
+	Validación
+	CA1. Cada aula tiene código único dentro de su pabellón, capacidad entera positiva, recursos y estado.
+CA2. Las asignaciones respetan la capacidad y los recursos obligatorios de la clase; se usa la cantidad de estudiantes de H21.
+CA3. No se permite desactivar un aula con asignaciones vigentes sin resolverlas previamente; se conserva el historial.
+	Impacto
+	22
+	Prioridad
+	3
+	Estimación
+	12 hrs
+	
+
+H12-Configuración de períodos académicos
+	COMO:
+	Administrador
+	QUIERO:
+	Registrar los períodos académicos y seleccionar el activo.
+	PARA:
+	Organizar la planificación y la consulta por período.
+	Validación
+	CA1. Se registran año lectivo, nombre del período y fechas; el inicio debe ser anterior al fin.
+CA2. Solo existe un período activo para la consulta predeterminada; cambiarlo no elimina los horarios anteriores.
+CA3. Cada horario se vincula a un período; la consulta histórica queda fuera de esta historia.
+	Impacto
+	20
+	Prioridad
+	4
+	Estimación
+	10 hrs
+	________________
+
+
+H13-Asignación y ajuste manual de horarios
+	COMO:
+	Administrador
+	QUIERO:
+	Crear y modificar asignaciones de docentes, asignaturas, secciones, aulas y bloques de clase.
+	PARA:
+	Organizar la programación académica y realizar ajustes.
+	Validación
+	CA1. Se seleccionan registros válidos del período, con día e intervalo de clase; no se aceptan referencias inexistentes o inactivas.
+CA2. Antes de guardar se aplican los controles de H14 y las restricciones obligatorias de disponibilidad, capacidad y recursos.
+CA3. Los cambios se guardan como borrador y no alteran el horario visible a los docentes hasta su publicación.
+	Impacto
+	28
+	Prioridad
+	5
+	Estimación
+	24 hrs
+	
+
+H14-Prevención de traslapes
+	COMO:
+	Administrador
+	QUIERO:
+	Identificar y corregir asignaciones que se solapen para un docente, aula o sección.
+	PARA:
+	Evitar horarios incompatibles.
+	Validación
+	CA1. Se rechaza guardar una asignación con solapamiento total o parcial de docente, aula o sección en el mismo día y período.
+CA2. La alerta identifica el recurso y las clases en conflicto; al editar, la asignación no se compara consigo misma.
+CA3. Se permiten clases consecutivas cuando una termina exactamente al iniciar la otra; se revalida al publicar.
+	Impacto
+	27
+	Prioridad
+	5
+	Estimación
+	16 hrs
+	________________
+
+
+
+
+H15-Disponibilidad horaria docente
+	COMO:
+	Administrador
+	QUIERO:
+	Registrar y actualizar la disponibilidad de los docentes por período.
+	PARA:
+	Planificar clases dentro de los intervalos autorizados.
+	Validación
+	CA1. Se registran días e intervalos con inicio anterior al fin; no se guardan intervalos duplicados o contradictorios.
+CA2. Una clase debe quedar completamente dentro de la disponibilidad registrada; sin disponibilidad se solicita completarla.
+CA3. Si una modificación invalida clases existentes, se identifican y se bloquea su publicación hasta corregirlas.
+	Impacto
+	25
+	Prioridad
+	4
+	Estimación
+	16 hrs
+	
+
+H16-Restricciones y preferencias de planificación
+	COMO:
+	Administrador
+	QUIERO:
+	Configurar restricciones obligatorias y prioridades de las preferencias.
+	PARA:
+	Ajustar las propuestas a las condiciones académicas.
+	Validación
+	CA1. No se pueden desactivar las reglas de no traslape de docente, aula y sección, ni la validez de las asignaciones.
+CA2. Se registran disponibilidad, capacidad y recursos obligatorios; las preferencias admiten pesos de 1 a 5.
+CA3. La configuración queda asociada al período y se aplica tanto al validar propuestas como al publicar horarios.
+	Impacto
+	26
+	Prioridad
+	4
+	Estimación
+	18 hrs
+	________________
+
+
+
+
+H17-Generación de propuestas con IA
+	COMO:
+	Administrador
+	QUIERO:
+	Generar una propuesta de horario a partir de los datos académicos y restricciones.
+	PARA:
+	Reducir el trabajo manual de planificación.
+	Validación
+	CA1. Se comprueba que existan datos de docentes, asignaturas, secciones, aulas, bloques y restricciones; se indican los faltantes.
+CA2. Se informa el estado de generación y se valida la propuesta contra las reglas obligatorias; los conflictos o clases sin asignar se detallan.
+CA3. La propuesta queda en borrador; ante error, indisponibilidad o ausencia de solución válida se informa y se permite continuar manualmente.
+	Impacto
+	30
+	Prioridad
+	5
+	Estimación
+	40 hrs
+	
+
+H18-Revisión y ajuste de propuestas de IA
+	COMO:
+	Administrador
+	QUIERO:
+	Revisar y modificar las asignaciones propuestas por la IA.
+	PARA:
+	Aplicar el criterio del responsable antes de publicar.
+	Validación
+	CA1. Se muestra el borrador, las asignaciones pendientes y los conflictos identificados en la propuesta.
+CA2. Los ajustes usan las validaciones de H13 a H16; no se guardan nuevos cambios que infrinjan reglas obligatorias.
+CA3. El borrador permanece separado del horario publicado y solo puede publicarse si supera la validación de H19.
+	Impacto
+	28
+	Prioridad
+	4
+	Estimación
+	24 hrs
+	________________
+
+
+
+
+H19-Publicación de horarios académicos
+	COMO:
+	Administrador
+	QUIERO:
+	Publicar un horario revisado y válido.
+	PARA:
+	Poner la programación oficial a disposición de los docentes.
+	Validación
+	CA1. Antes de publicar se comprueban asignaciones completas y reglas obligatorias; cualquier incumplimiento bloquea la publicación.
+CA2. La publicación reemplaza íntegramente la versión visible del período y registra fecha y responsable; los borradores siguen ocultos.
+CA3. Los docentes consultan su nueva versión; si H07 está implementada, se notifican los cambios a quienes resulten afectados.
+	Impacto
+	29
+	Prioridad
+	5
+	Estimación
+	12 hrs
+	
+
+H20-Exportación de horarios publicados
+	COMO:
+	Administrador
+	QUIERO:
+	Exportar horarios publicados en PDF y XLSX.
+	PARA:
+	Archivar o distribuir la programación oficial.
+	Validación
+	CA1. Se selecciona el período y un docente o el conjunto de docentes para exportar únicamente horarios publicados.
+CA2. PDF y XLSX incluyen identificación institucional, docente, período, asignaturas, secciones, días, horas, aulas y pabellones.
+CA3. Los archivos se abren y contienen los datos de la versión seleccionada; si no hay horario publicado, se informa sin generar datos ficticios.
+	Impacto
+	22
+	Prioridad
+	3
+	Estimación
+	12 hrs
+	________________
+
+
+H21-Gestión de secciones académicas
+	COMO:
+	Administrador
+	QUIERO:
+	Registrar secciones y vincularlas con su carrera, año, período y asignaturas.
+	PARA:
+	Disponer de los grupos necesarios para planificar las clases.
+	Validación
+	CA1. Se registran código, carrera, año de estudio, período y cantidad de estudiantes; no se duplica el código dentro de carrera y período.
+CA2. Se vinculan las asignaturas de la sección y sus horas requeridas; la cantidad de estudiantes es un entero positivo.
+CA3. Se conservan las referencias de secciones usadas en horarios; no se registran matrículas individuales ni calificaciones.
+	Impacto
+	28
+	Prioridad
+	5
+	Estimación
+	16 hrs
+	
+
+H22-Configuración de bloques de clase
+	COMO:
+	Administrador
+	QUIERO:
+	Definir días habilitados, bloques de clase y recesos por período.
+	PARA:
+	Usar intervalos válidos en la planificación manual y asistida.
+	Validación
+	CA1. Cada bloque contiene día, inicio y fin; el inicio es anterior al fin y no se permiten bloques superpuestos dentro del mismo día y período.
+CA2. Se configuran días habilitados y recesos; las clases se asignan a bloques habilitados sin invadir recesos.
+CA3. Se impide modificar o eliminar un bloque utilizado si el cambio invalida asignaciones, hasta resolverlas.
+	Impacto
+	27
+	Prioridad
+	5
+	Estimación
+	12 hrs
+	________________
+
+
+H23-Cierre de sesión
+	COMO:
+	Usuario autenticado
+	QUIERO:
+	Cerrar mi sesión.
+	PARA:
+	Impedir que otra persona utilice mi acceso desde el dispositivo.
+	Validación
+	CA1. Al cerrar sesión se eliminan las credenciales y los datos locales del usuario, incluido el horario guardado si existe.
+CA2. La aplicación vuelve al acceso y no permite recuperar pantallas privadas mediante la navegación hacia atrás.
+CA3. Con conexión, la sesión se invalida también en el servidor; sin conexión, el cierre local se completa y se informa esa limitación.
+	Impacto
+	20
+	Prioridad
+	4
+	Estimación
+	8 hrs
+	
+
+
+
+
+
+
+
+
+
+Gestión de planificación SCRUM
+Product Backlog priorizado por sprint
+
+
+ID
+	Historia de Usuario
+	Prioridad
+	Impacto
+	Importancia
+	Tiempo estimado
+	H01
+	Inicio de sesión y autenticación
+	5
+	30
+	150
+	12 hrs
+	H04
+	Consulta del horario semanal
+	5
+	30
+	150
+	24 hrs
+	H17
+	Generación de propuestas con IA
+	5
+	30
+	150
+	40 hrs
+	H19
+	Publicación de horarios académicos
+	5
+	29
+	145
+	12 hrs
+	H06
+	Consulta del aula y pabellón
+	5
+	28
+	140
+	8 hrs
+	H13
+	Asignación y ajuste manual de horarios
+	5
+	28
+	140
+	24 hrs
+	H21
+	Gestión de secciones académicas
+	5
+	28
+	140
+	16 hrs
+	H14
+	Prevención de traslapes
+	5
+	27
+	135
+	16 hrs
+	H22
+	Configuración de bloques de clase
+	5
+	27
+	135
+	12 hrs
+	H05
+	Detalle de asignaturas y secciones
+	5
+	24
+	120
+	8 hrs
+	H08
+	Consulta del horario sin conexión
+	4
+	28
+	112
+	16 hrs
+	H18
+	Revisión y ajuste de propuestas de IA
+	4
+	28
+	112
+	24 hrs
+	H16
+	Restricciones y preferencias de planificación
+	4
+	26
+	104
+	18 hrs
+	H03
+	Gestión de cuentas y roles
+	4
+	25
+	100
+	16 hrs
+	H15
+	Disponibilidad horaria docente
+	4
+	25
+	100
+	16 hrs
+	H02
+	Recuperación de contraseña
+	4
+	20
+	80
+	16 hrs
+	H12
+	Configuración de períodos académicos
+	4
+	20
+	80
+	10 hrs
+	H23
+	Cierre de sesión
+	4
+	20
+	80
+	8 hrs
+	H07
+	Notificaciones de cambios publicados
+	3
+	26
+	78
+	20 hrs
+	H09
+	Importación de datos de docentes
+	3
+	22
+	66
+	16 hrs
+	H11
+	Gestión de aulas y capacidad
+	3
+	22
+	66
+	12 hrs
+	H20
+	Exportación de horarios publicados
+	3
+	22
+	66
+	12 hrs
+	H10
+	Gestión de asignaturas
+	3
+	20
+	60
+	12 hrs
+	Tiempo estimado total: 368 horas-persona.
+Sprint Backlog #1
+Período propuesto: Semanas 1–2 · Duración: 2 semanas · Estimación: 62 horas-persona.
+Objetivo: Permitir que el personal autorizado acceda al sistema y que el administrador gestione cuentas y períodos académicos.
+ID
+	Historia y tareas previstas
+	Horas
+	H01
+	Inicio de sesión y autenticación
+Implementar el formulario de acceso, validar credenciales y estado de cuenta y aplicar permisos por rol.
+	12
+	H03
+	Gestión de cuentas y roles
+Crear, editar y desactivar cuentas; validar datos y duplicados y proteger al último administrador activo.
+	16
+	H12
+	Configuración de períodos académicos
+Registrar períodos y fechas, seleccionar un único período activo y conservar los horarios anteriores.
+	10
+	H23
+	Cierre de sesión
+Cerrar la sesión, retirar credenciales y datos locales y bloquear el regreso a pantallas privadas.
+	8
+	H02
+	Recuperación de contraseña
+Implementar solicitud por correo, enlace de 30 minutos y uso único y cambio de contraseña.
+	16
+	Diagrama de evolución del Sprint #1
+Entregable funcional Sprint #1
+Sprint Backlog #2
+Período propuesto: Semanas 3–4 · Duración: 2 semanas · Estimación: 52 horas-persona.
+Objetivo: Disponer de los catálogos académicos y espacios necesarios para construir un horario.
+ID
+	Historia y tareas previstas
+	Horas
+	H10
+	Gestión de asignaturas
+Registrar y consultar asignaturas y horas; filtrar, validar códigos y proteger registros vinculados.
+	12
+	H11
+	Gestión de aulas y capacidad
+Registrar aulas, pabellones, capacidad, recursos y estado; proteger las asignaciones existentes.
+	12
+	H21
+	Gestión de secciones académicas
+Registrar secciones y cantidad de estudiantes y vincular período, carrera, año y asignaturas.
+	16
+	H22
+	Configuración de bloques de clase
+Configurar días, bloques y recesos; validar intervalos y proteger los bloques utilizados.
+	12
+	Diagrama de evolución del Sprint #2
+Entregable funcional Sprint #2
+Sprint Backlog #3
+Período propuesto: Semanas 5–6 · Duración: 2 semanas · Estimación: 74 horas-persona.
+Objetivo: Construir un borrador de horario que respete disponibilidad y restricciones obligatorias.
+ID
+	Historia y tareas previstas
+	Horas
+	H15
+	Disponibilidad horaria docente
+Registrar disponibilidad por docente y período y detectar asignaciones que queden fuera de ella.
+	16
+	H16
+	Restricciones y preferencias de planificación
+Configurar restricciones obligatorias y pesos de preferencias y centralizar su aplicación.
+	18
+	H13
+	Asignación y ajuste manual de horarios
+Crear y editar asignaciones en borrador usando los catálogos y las validaciones comunes.
+	24
+	H14
+	Prevención de traslapes
+Detectar traslapes de docente, aula y sección; identificar el conflicto y rechazar su guardado.
+	16
+	
+
+Diagrama de evolución del Sprint #3
+Entregable funcional Sprint #3
+Sprint Backlog #4
+Período propuesto: Semanas 7–8 · Duración: 2 semanas · Estimación: 52 horas-persona.
+Objetivo: Publicar la programación revisada y permitir que cada docente consulte su horario desde la aplicación móvil.
+ID
+	Historia y tareas previstas
+	Horas
+	H19
+	Publicación de horarios académicos
+Validar el horario completo, publicar una versión íntegra y registrar fecha y responsable.
+	12
+	H04
+	Consulta del horario semanal
+Construir la consulta semanal del horario propio y los estados sin clases y error de conexión.
+	24
+	H05
+	Detalle de asignaturas y secciones
+Mostrar detalle de asignatura, sección, carrera, año de estudio y período de la clase elegida.
+	8
+	H06
+	Consulta del aula y pabellón
+Mostrar aula y pabellón en resumen y detalle, sincronizados con la versión publicada.
+	8
+	Diagrama de evolución del Sprint #4
+Entregable funcional Sprint #4
+Sprint Backlog #5
+Período propuesto: Semanas 9–10 · Duración: 2 semanas · Estimación: 64 horas-persona.
+Objetivo: Generar una propuesta de horario, revisarla y ajustarla con control humano antes de su publicación.
+ID
+	Historia y tareas previstas
+	Horas
+	H17
+	Generación de propuestas con IA
+Integrar la generación asistida, validar datos y respuesta y gestionar pendientes y fallos.
+	40
+	H18
+	Revisión y ajuste de propuestas de IA
+Mostrar el borrador de IA, permitir ajustes mediante la edición manual y conservar las validaciones.
+	24
+	Diagrama de evolución del Sprint #5
+Entregable funcional Sprint #5
+Sprint Backlog #6
+Período propuesto: Semanas 11–12 · Duración: 2 semanas · Estimación: 64 horas-persona.
+Objetivo: Facilitar la carga de docentes, comunicar cambios oficiales y ampliar la consulta y distribución de horarios.
+ID
+	Historia y tareas previstas
+	Horas
+	H09
+	Importación de datos de docentes
+Importar CSV/XLSX, validar columnas y duplicados y presentar resultados y errores por fila.
+	16
+	H07
+	Notificaciones de cambios publicados
+Solicitar notificaciones al publicar cambios, dirigirlas a afectados y abrir el horario actualizado.
+	20
+	H08
+	Consulta del horario sin conexión
+Guardar la última consulta, mostrar fecha y aviso sin conexión y actualizar o limpiar la copia.
+	16
+	H20
+	Exportación de horarios publicados
+Generar PDF y XLSX de horarios publicados, con datos completos del período y docentes elegidos.
+	12
+	Evidencias en repositorio - Historial de Commit
+Arquitectura Modular y Estructura del Frontend y Backend
+Metodología
+
+
+________________
+
+
+
+
+Capítulo III: Conclusiones y Recomendaciones
+Conclusiones
+Recomendaciones
+Referencias Bibliográficas
+Chen, M. C., Sze, S. N., Goh, S. L., Sabar, N. R., & Kendall, G. (2021). A Survey of University Course Timetabling Problem: Perspectives, Trends and Opportunities. IEEE Access, 9, 106515–106529. https://doi.org/10.1109/ACCESS.2021.3100613
+Steiner, E., Pferschy, U., & Schaerf, A. (2025). Curriculum-based university course timetabling considering individual course of studies. Central European Journal of Operations Research, 33, 277–314. https://doi.org/10.1007/s10100-024-00923-2 
+Microsoft. (2024). ASP.NET Documentation. https://learn.microsoft.com/aspnet/
+Capítulo IV: Anexos
+Cronograma de actividades
+Cronograma_Proyecto_Horarios_UNAN.xlsx
+________________
+Costos y presupuesto del proyecto
+________________
+Descripción de uso de recursos en la nube
+________________
+Registro de asistencias
