@@ -52,7 +52,7 @@ export default function AdminDashboard() {
                 <View style={styles.actionsContainer}>
                     {[
                         { label: 'Gestionar Cuentas', icon: '👥', desc: 'Crear, editar o desactivar' },
-                        { label: 'Períodos Académicos', icon: '📅', desc: 'Configurar período activo' },
+                        { label: 'Semestres Académicos', icon: '📅', desc: 'Configurar semestre activo' },
                     ].map((action, index) => (
                         <View key={index} style={styles.actionCard}>
                             <Text style={styles.actionIcon}>{action.icon}</Text>

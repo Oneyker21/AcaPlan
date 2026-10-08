@@ -29,7 +29,7 @@ export default function DocenteHomeScreen() {
                     <Text style={styles.placeholderTitle}>Tu horario semanal</Text>
                     <Text style={styles.placeholderText}>
                         La consulta de horarios estará disponible próximamente.{'\n'}
-                        Se mostrará aquí tu horario del período activo.
+                        Se mostrará aquí tu horario del semestre activo.
                     </Text>
                 </View>
             </View>

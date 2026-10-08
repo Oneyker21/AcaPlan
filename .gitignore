@@ -41,3 +41,12 @@ example
 # generated native folders
 /ios
 /android
+
+# Sensitive Files
+.env
+*.txt
+*.sql
+
+.env
+.env.*
+!.env.example

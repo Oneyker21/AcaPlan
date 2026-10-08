@@ -48,8 +48,8 @@ export default function AdminLayout() {
             <Tabs.Screen
                 name="periods"
                 options={{
-                    title: 'Períodos',
-                    headerTitle: 'Períodos Académicos',
+                    title: 'Semestres',
+                    headerTitle: 'Semestres Académicos',
                     tabBarIcon: ({ color }) => <Text style={{ fontSize: 20, color }}>📅</Text>,
                 }}
             />
