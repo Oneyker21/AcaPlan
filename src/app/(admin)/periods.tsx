@@ -1,5 +1,5 @@
 import { BorderRadius, Colors, Shadows, Spacing, Typography } from '@/constants/theme';
-import { supabase } from '@/lib/supabase';
+import { activatePeriod, listPeriods, savePeriod } from '@/services/management';
 import { Periodo } from '@/types/database';
 import React, { useCallback, useEffect, useState } from 'react';
 import {
@@ -41,16 +41,15 @@ export default function PeriodsScreen() {
     const [saving, setSaving] = useState(false);
 
     const fetchPeriodos = useCallback(async () => {
-        const { data, error } = await supabase
-            .from('periodos')
-            .select('*')
-            .order('ano_lectivo', { ascending: false });
-
-        if (!error && data) {
-            setPeriodos(data as Periodo[]);
+        try {
+            setPeriodos(await listPeriods());
+        } catch (error) {
+            setPeriodos([]);
+            Alert.alert('Error', error instanceof Error ? error.message : 'No se pudieron cargar los semestres.');
+        } finally {
+            setLoading(false);
+            setRefreshing(false);
         }
-        setLoading(false);
-        setRefreshing(false);
     }, []);
 
     useEffect(() => {
@@ -80,97 +79,43 @@ export default function PeriodsScreen() {
     };
 
     const handleSave = async () => {
+        if (saving) return;
         if (!form.nombre.trim() || !form.ano_lectivo.trim() || !form.fecha_inicio.trim() || !form.fecha_fin.trim()) {
-            Alert.alert('Error', 'Todos los campos son obligatorios.');
-            return;
+            Alert.alert('Error', 'Todos los campos son obligatorios.'); return;
         }
-
-        // H12-CA1: Start before end
-        if (form.fecha_inicio >= form.fecha_fin) {
-            Alert.alert('Error', 'La fecha de inicio debe ser anterior a la fecha de fin.');
-            return;
-        }
-
         setSaving(true);
-
         try {
-            const data = {
-                nombre: form.nombre.trim(),
-                ano_lectivo: parseInt(form.ano_lectivo),
-                fecha_inicio: form.fecha_inicio,
-                fecha_fin: form.fecha_fin,
-            };
-
-            if (editingPeriod) {
-                const { error } = await supabase
-                    .from('periodos')
-                    .update(data)
-                    .eq('id_periodo', editingPeriod.id_periodo);
-
-                if (error) {
-                    Alert.alert('Error', 'No se pudo actualizar el período.');
-                    setSaving(false);
-                    return;
-                }
-            } else {
-                const { error } = await supabase
-                    .from('periodos')
-                    .insert({ ...data, es_activo: false });
-
-                if (error) {
-                    Alert.alert('Error', 'No se pudo crear el período.');
-                    setSaving(false);
-                    return;
-                }
-            }
-
+            await savePeriod({
+                ...(editingPeriod ? { id: editingPeriod.id_periodo } : {}),
+                nombre: form.nombre.trim(), ano_lectivo: Number(form.ano_lectivo),
+                fecha_inicio: form.fecha_inicio.trim(), fecha_fin: form.fecha_fin.trim(),
+            });
             setModalVisible(false);
-            fetchPeriodos();
-        } catch {
-            Alert.alert('Error', 'Error de conexión.');
-        }
-
-        setSaving(false);
+            await fetchPeriodos();
+        } catch (error) {
+            Alert.alert('Error', error instanceof Error ? error.message : 'No se pudo guardar el semestre.');
+        } finally { setSaving(false); }
     };
 
-    // H12-CA2: Only one active period
-    const handleToggleActive = async (period: Periodo) => {
-        if (period.es_activo) {
-            // Deactivate
-            const { error } = await supabase
-                .from('periodos')
-                .update({ es_activo: false })
-                .eq('id_periodo', period.id_periodo);
-
-            if (!error) fetchPeriodos();
-        } else {
-            // Deactivate all, then activate this one
-            Alert.alert(
-                'Activar período',
-                `¿Establecer "${period.nombre} ${period.ano_lectivo}" como período activo? Solo puede haber un período activo.`,
-                [
-                    { text: 'Cancelar', style: 'cancel' },
-                    {
-                        text: 'Activar',
-                        onPress: async () => {
-                            // Deactivate all
-                            await supabase
-                                .from('periodos')
-                                .update({ es_activo: false })
-                                .neq('id_periodo', 0);
-
-                            // Activate selected
-                            const { error } = await supabase
-                                .from('periodos')
-                                .update({ es_activo: true })
-                                .eq('id_periodo', period.id_periodo);
-
-                            if (!error) fetchPeriodos();
-                        },
-                    },
-                ]
-            );
-        }
+    const handleToggleActive = (period: Periodo) => {
+        if (saving) return;
+        Alert.alert(
+            period.es_activo ? 'Desactivar semestre' : 'Activar semestre',
+            period.es_activo ? 'No quedará ningún semestre activo. ¿Continuar?'
+                : 'Se activará este semestre y se desactivará el anterior, conservando el historial. ¿Continuar?',
+            [
+                { text: 'Cancelar', style: 'cancel' },
+                { text: 'Confirmar', onPress: async () => {
+                    setSaving(true);
+                    try {
+                        await activatePeriod(period.id_periodo, !period.es_activo);
+                        await fetchPeriodos();
+                    } catch (error) {
+                        Alert.alert('Error', error instanceof Error ? error.message : 'No se pudo cambiar el semestre activo.');
+                    } finally { setSaving(false); }
+                } },
+            ]
+        );
     };
 
     const renderPeriod = ({ item }: { item: Periodo }) => (
@@ -202,6 +147,7 @@ export default function PeriodsScreen() {
             <View style={styles.periodActions}>
                 <TouchableOpacity
                     style={styles.periodEditBtn}
+                    disabled={saving}
                     onPress={() => openEditModal(item)}
                 >
                     <Text style={styles.periodEditText}>✏️ Editar</Text>
@@ -212,6 +158,7 @@ export default function PeriodsScreen() {
                         {item.es_activo ? 'Activo' : 'Inactivo'}
                     </Text>
                     <Switch
+                        disabled={saving}
                         value={item.es_activo}
                         onValueChange={() => handleToggleActive(item)}
                         trackColor={{ false: Colors.border, true: Colors.accent + '50' }}
@@ -244,14 +191,14 @@ export default function PeriodsScreen() {
                 ListEmptyComponent={
                     <View style={styles.emptyContainer}>
                         <Text style={styles.emptyIcon}>📅</Text>
-                        <Text style={styles.emptyText}>No hay períodos registrados</Text>
-                        <Text style={styles.emptySubtext}>Agrega el primer período académico</Text>
+                        <Text style={styles.emptyText}>No hay semestres registrados</Text>
+                        <Text style={styles.emptySubtext}>Agrega el primer semestre académico</Text>
                     </View>
                 }
             />
 
             {/* FAB */}
-            <TouchableOpacity style={styles.fab} onPress={openCreateModal} activeOpacity={0.8}>
+            <TouchableOpacity style={styles.fab} disabled={saving} onPress={openCreateModal} activeOpacity={0.8}>
                 <Text style={styles.fabText}>+</Text>
             </TouchableOpacity>
 
@@ -260,11 +207,11 @@ export default function PeriodsScreen() {
                 <View style={styles.modalOverlay}>
                     <View style={styles.modalCard}>
                         <Text style={styles.modalTitle}>
-                            {editingPeriod ? 'Editar Período' : 'Nuevo Período'}
+                            {editingPeriod ? 'Editar Semestre' : 'Nuevo Semestre'}
                         </Text>
 
                         <View style={styles.formGroup}>
-                            <Text style={styles.formLabel}>Nombre del período</Text>
+                            <Text style={styles.formLabel}>Nombre del semestre</Text>
                             <TextInput
                                 style={styles.formInput}
                                 value={form.nombre}

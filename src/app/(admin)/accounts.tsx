@@ -1,6 +1,6 @@
 import { BorderRadius, Colors, Shadows, Spacing, Typography } from '@/constants/theme';
-import { supabase } from '@/lib/supabase';
-import { GeneralEstado, UserRol, Usuario } from '@/types/database';
+import { createAccount, listAccounts, ManagedAccount, updateAccount } from '@/services/management';
+import { GeneralEstado, UserRol } from '@/types/database';
 import React, { useCallback, useEffect, useState } from 'react';
 import {
     ActivityIndicator,
@@ -33,26 +33,25 @@ const emptyForm: AccountForm = {
 };
 
 export default function AccountsScreen() {
-    const [usuarios, setUsuarios] = useState<Usuario[]>([]);
+    const [usuarios, setUsuarios] = useState<ManagedAccount[]>([]);
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
     const [modalVisible, setModalVisible] = useState(false);
-    const [editingUser, setEditingUser] = useState<Usuario | null>(null);
+    const [editingUser, setEditingUser] = useState<ManagedAccount | null>(null);
     const [form, setForm] = useState<AccountForm>(emptyForm);
     const [saving, setSaving] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
 
     const fetchUsuarios = useCallback(async () => {
-        const { data, error } = await supabase
-            .from('usuarios')
-            .select('*')
-            .order('id_usuario', { ascending: true });
-
-        if (!error && data) {
-            setUsuarios(data as Usuario[]);
+        try {
+            setUsuarios(await listAccounts());
+        } catch (error) {
+            setUsuarios([]);
+            Alert.alert('Error', error instanceof Error ? error.message : 'No se pudieron cargar las cuentas.');
+        } finally {
+            setLoading(false);
+            setRefreshing(false);
         }
-        setLoading(false);
-        setRefreshing(false);
     }, []);
 
     useEffect(() => {
@@ -77,7 +76,7 @@ export default function AccountsScreen() {
         setModalVisible(true);
     };
 
-    const openEditModal = (user: Usuario) => {
+    const openEditModal = (user: ManagedAccount) => {
         setEditingUser(user);
         setForm({
             nombre: user.nombre,
@@ -90,85 +89,27 @@ export default function AccountsScreen() {
     };
 
     const handleSave = async () => {
-        // Validate required fields
+        if (saving) return;
         if (!form.nombre.trim() || !form.correo.trim() || !form.cedula.trim()) {
-            Alert.alert('Error', 'Nombre, correo y cédula son obligatorios.');
-            return;
+            Alert.alert('Error', 'Nombre, correo y cédula son obligatorios.'); return;
         }
-        if (!editingUser && !form.contrasena.trim()) {
-            Alert.alert('Error', 'La contraseña es obligatoria para nuevos usuarios.');
-            return;
+        if (!editingUser && (form.contrasena.length < 8 || form.contrasena.length > 128)) {
+            Alert.alert('Error', 'La contraseña inicial debe tener entre 8 y 128 caracteres.'); return;
         }
-
         setSaving(true);
-
         try {
-            if (editingUser) {
-                // Update existing user (H03-CA2)
-                const updateData: Partial<Usuario> = {
-                    nombre: form.nombre.trim(),
-                    correo: form.correo.trim(),
-                    cedula: form.cedula.trim(),
-                    rol: form.rol,
-                };
-
-                const { error } = await supabase
-                    .from('usuarios')
-                    .update(updateData)
-                    .eq('id_usuario', editingUser.id_usuario);
-
-                if (error) {
-                    Alert.alert('Error', error.message.includes('unique')
-                        ? 'El correo o cédula ya están registrados.'
-                        : 'No se pudo actualizar la cuenta.');
-                    setSaving(false);
-                    return;
-                }
-            } else {
-                // Create new user
-                // First create in Supabase Auth
-                const { error: authError } = await supabase.auth.signUp({
-                    email: form.correo.trim(),
-                    password: form.contrasena,
-                });
-
-                if (authError) {
-                    Alert.alert('Error', 'No se pudo crear la cuenta de autenticación.');
-                    setSaving(false);
-                    return;
-                }
-
-                // Then create in usuarios table
-                const { error: dbError } = await supabase
-                    .from('usuarios')
-                    .insert({
-                        nombre: form.nombre.trim(),
-                        correo: form.correo.trim(),
-                        cedula: form.cedula.trim(),
-                        contrasena: '***', // Auth is handled by Supabase Auth
-                        rol: form.rol,
-                        estado: 'activo',
-                    });
-
-                if (dbError) {
-                    Alert.alert('Error', dbError.message.includes('unique')
-                        ? 'El correo o cédula ya están registrados.'
-                        : 'No se pudo crear la cuenta.');
-                    setSaving(false);
-                    return;
-                }
-            }
-
+            const fields = { nombre: form.nombre.trim(), cedula: form.cedula.trim(), rol: form.rol };
+            if (editingUser) await updateAccount(editingUser.id_usuario, fields);
+            else await createAccount({ ...fields, correo: form.correo.trim().toLowerCase(), password: form.contrasena });
             setModalVisible(false);
-            fetchUsuarios();
-        } catch {
-            Alert.alert('Error', 'Error de conexión. Intente de nuevo.');
-        }
-
-        setSaving(false);
+            setForm(emptyForm);
+            await fetchUsuarios();
+        } catch (error) {
+            Alert.alert('Error', error instanceof Error ? error.message : 'No se pudo guardar la cuenta.');
+        } finally { setSaving(false); }
     };
 
-    const handleToggleStatus = async (user: Usuario) => {
+    const handleToggleStatus = async (user: ManagedAccount) => {
         // H03-CA3: Prevent deactivating the last active admin
         if (user.estado === 'activo' && user.rol === 'administrador') {
             const activeAdmins = usuarios.filter(
@@ -194,21 +135,21 @@ export default function AccountsScreen() {
                     text: 'Confirmar',
                     style: newStatus === 'inactivo' ? 'destructive' : 'default',
                     onPress: async () => {
-                        const { error } = await supabase
-                            .from('usuarios')
-                            .update({ estado: newStatus })
-                            .eq('id_usuario', user.id_usuario);
-
-                        if (!error) {
-                            fetchUsuarios();
-                        }
+                        if (saving) return;
+                        setSaving(true);
+                        try {
+                            await updateAccount(user.id_usuario, { estado: newStatus });
+                            await fetchUsuarios();
+                        } catch (error) {
+                            Alert.alert('Error', error instanceof Error ? error.message : 'No se pudo cambiar el estado.');
+                        } finally { setSaving(false); }
                     },
                 },
             ]
         );
     };
 
-    const renderUser = ({ item }: { item: Usuario }) => (
+    const renderUser = ({ item }: { item: ManagedAccount }) => (
         <View style={styles.userCard}>
             <View style={styles.userHeader}>
                 <View style={[
@@ -235,6 +176,7 @@ export default function AccountsScreen() {
             <View style={styles.userActions}>
                 <TouchableOpacity
                     style={[styles.actionBtn, styles.editBtn]}
+                    disabled={saving}
                     onPress={() => openEditModal(item)}
                 >
                     <Text style={styles.editBtnText}>Editar</Text>
@@ -244,6 +186,7 @@ export default function AccountsScreen() {
                         styles.actionBtn,
                         item.estado === 'activo' ? styles.deactivateBtn : styles.activateBtn,
                     ]}
+                    disabled={saving}
                     onPress={() => handleToggleStatus(item)}
                 >
                     <Text style={[
@@ -297,7 +240,7 @@ export default function AccountsScreen() {
             />
 
             {/* FAB */}
-            <TouchableOpacity style={styles.fab} onPress={openCreateModal} activeOpacity={0.8}>
+            <TouchableOpacity style={styles.fab} disabled={saving} onPress={openCreateModal} activeOpacity={0.8}>
                 <Text style={styles.fabText}>+</Text>
             </TouchableOpacity>
 
@@ -321,10 +264,11 @@ export default function AccountsScreen() {
                         </View>
 
                         <View style={styles.formGroup}>
-                            <Text style={styles.formLabel}>Correo institucional</Text>
+                            <Text style={styles.formLabel}>{editingUser ? 'Correo institucional (no editable)' : 'Correo institucional'}</Text>
                             <TextInput
                                 style={styles.formInput}
                                 value={form.correo}
+                                editable={!editingUser && !saving}
                                 onChangeText={(v) => setForm({ ...form, correo: v })}
                                 placeholder="correo@unan.edu.ni"
                                 placeholderTextColor={Colors.textTertiary}
