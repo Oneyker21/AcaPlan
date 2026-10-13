@@ -45,6 +45,10 @@ export default function DocenteLayout() {
                     tabBarIcon: ({ color }) => <Text style={{ fontSize: 20, color }}>⚙️</Text>,
                 }}
             />
+            <Tabs.Screen
+                name="consultation"
+                options={{ title: 'Consulta', headerTitle: 'Consulta de horarios', tabBarIcon: ({ color }) => <Text style={{ fontSize: 20, color }}>🗓️</Text> }}
+            />
         </Tabs>
     );
 }

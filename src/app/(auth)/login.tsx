@@ -132,7 +132,7 @@ export default function LoginScreen() {
 
                 {/* Footer */}
                 <Text style={styles.footer}>
-                    © 2026 CUR-Chontales "Cornelio Silva Argüello"
+                    © 2026 CUR-Chontales &quot;Cornelio Silva Argüello&quot;
                 </Text>
             </View>
         </KeyboardAvoidingView>

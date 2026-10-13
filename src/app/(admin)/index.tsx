@@ -1,17 +1,40 @@
 import { BorderRadius, Colors, Shadows, Spacing, Typography } from '@/constants/theme';
 import { useAuth } from '@/context/AuthContext';
-import React from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { supabase } from '@/lib/supabase';
+import { useRouter } from 'expo-router';
+import React, { useEffect, useState } from 'react';
+import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function AdminDashboard() {
     const { profile } = useAuth();
+    const router = useRouter();
+    const [counts, setCounts] = useState({ docentes: '—', asignaturas: '—', aulas: '—', secciones: '—' });
+
+    useEffect(() => {
+        let mounted = true;
+        void Promise.all([
+            supabase.from('usuarios').select('id_usuario', { count: 'exact', head: true }).eq('rol', 'docente'),
+            supabase.from('asignaturas').select('id_asignatura', { count: 'exact', head: true }),
+            supabase.from('aulas').select('id_aula', { count: 'exact', head: true }),
+            supabase.from('secciones').select('id_seccion', { count: 'exact', head: true }),
+        ]).then(([docentes, asignaturas, aulas, secciones]) => {
+            if (!mounted) return;
+            setCounts({
+                docentes: docentes.error ? '—' : String(docentes.count ?? 0),
+                asignaturas: asignaturas.error ? '—' : String(asignaturas.count ?? 0),
+                aulas: aulas.error ? '—' : String(aulas.count ?? 0),
+                secciones: secciones.error ? '—' : String(secciones.count ?? 0),
+            });
+        }).catch(() => undefined);
+        return () => { mounted = false; };
+    }, []);
 
     const stats = [
-        { label: 'Docentes', value: '—', icon: '👨‍🏫', color: '#4A90D9' },
-        { label: 'Asignaturas', value: '—', icon: '📚', color: '#2ECC71' },
-        { label: 'Aulas', value: '—', icon: '🏫', color: '#F39C12' },
-        { label: 'Secciones', value: '—', icon: '📋', color: '#E74C3C' },
+        { label: 'Docentes', value: counts.docentes, icon: '👨‍🏫', color: '#4A90D9' },
+        { label: 'Asignaturas', value: counts.asignaturas, icon: '📚', color: '#2ECC71' },
+        { label: 'Aulas', value: counts.aulas, icon: '🏫', color: '#F39C12' },
+        { label: 'Secciones', value: counts.secciones, icon: '📋', color: '#E74C3C' },
     ];
 
     return (
@@ -51,17 +74,24 @@ export default function AdminDashboard() {
                 <Text style={styles.sectionTitle}>Acciones Rápidas</Text>
                 <View style={styles.actionsContainer}>
                     {[
-                        { label: 'Gestionar Cuentas', icon: '👥', desc: 'Crear, editar o desactivar' },
-                        { label: 'Períodos Académicos', icon: '📅', desc: 'Configurar período activo' },
+                        { label: 'Gestionar Cuentas', icon: '👥', desc: 'Crear, editar o desactivar', route: '/(admin)/accounts' },
+                        { label: 'Períodos Académicos', icon: '📅', desc: 'Configurar período activo', route: '/(admin)/periods' },
+                        { label: 'Secciones Académicas', icon: '📚', desc: 'Gestionar secciones y asignaturas', route: '/(admin)/sections' },
+                        { label: 'Bloques de Clase', icon: '⏰', desc: 'Configurar duración y recesos', route: '/(admin)/blocks' },
+                        { label: 'Catálogos', icon: '🏫', desc: 'Gestionar carreras, asignaturas, pabellones y aulas', route: '/(admin)/catalogs' },
+                        { label: 'Planificar Horarios', icon: '🗓️', desc: 'Asignar recursos y publicar horarios', route: '/(admin)/schedule' },
+                        { label: 'Consultar Horarios', icon: '👀', desc: 'Revisar propuestas compartidas y horarios oficiales', route: '/(admin)/consultation' },
+                        { label: 'Asignación Académica', icon: '🧑‍🏫', desc: 'Registrar grupos, docentes y necesidades', route: '/(admin)/academic-assignments' },
+                        { label: 'Importar Asignación', icon: '📥', desc: 'Validar el archivo oficial en vista previa', route: '/(admin)/assignment-import' },
                     ].map((action, index) => (
-                        <View key={index} style={styles.actionCard}>
+                        <TouchableOpacity key={index} style={styles.actionCard} onPress={() => router.push(action.route as any)} activeOpacity={0.7}>
                             <Text style={styles.actionIcon}>{action.icon}</Text>
                             <View style={styles.actionTextContainer}>
                                 <Text style={styles.actionLabel}>{action.label}</Text>
                                 <Text style={styles.actionDesc}>{action.desc}</Text>
                             </View>
                             <Text style={styles.actionArrow}>›</Text>
-                        </View>
+                        </TouchableOpacity>
                     ))}
                 </View>
             </ScrollView>

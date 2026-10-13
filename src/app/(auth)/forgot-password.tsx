@@ -67,7 +67,7 @@ export default function ForgotPasswordScreen() {
                             <Text style={styles.successTitle}>Correo enviado</Text>
                             <Text style={styles.successText}>
                                 Si el correo está registrado, recibirás un enlace para restablecer
-                                tu contraseña. El enlace vence en 30 minutos.
+                                tu contraseña. Si el enlace vence, solicita uno nuevo.
                             </Text>
                             <TouchableOpacity
                                 style={styles.button}

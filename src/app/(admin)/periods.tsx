@@ -1,19 +1,21 @@
 import { BorderRadius, Colors, Shadows, Spacing, Typography } from '@/constants/theme';
 import { supabase } from '@/lib/supabase';
 import { Periodo } from '@/types/database';
+import DateTimePicker from '@react-native-community/datetimepicker';
 import React, { useCallback, useEffect, useState } from 'react';
 import {
     ActivityIndicator,
     Alert,
     FlatList,
     Modal,
+    Platform,
     RefreshControl,
     StyleSheet,
     Switch,
     Text,
     TextInput,
     TouchableOpacity,
-    View,
+    View
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -40,6 +42,37 @@ export default function PeriodsScreen() {
     const [form, setForm] = useState<PeriodForm>(emptyForm);
     const [saving, setSaving] = useState(false);
 
+    // DateTimePicker States
+    const [showInicioPicker, setShowInicioPicker] = useState(false);
+    const [showFinPicker, setShowFinPicker] = useState(false);
+    const [dateInicio, setDateInicio] = useState(new Date());
+    const [dateFin, setDateFin] = useState(new Date());
+
+    // Parseo seguro de fecha
+    const getValidDate = (dateString: string) => {
+        if (!dateString) return new Date();
+        const parsed = new Date(dateString + 'T12:00:00Z');
+        return isNaN(parsed.getTime()) ? new Date() : parsed;
+    };
+
+    const handleDateInitioChange = (event: any, selectedDate?: Date) => {
+        const currentDate = selectedDate || dateInicio;
+        setShowInicioPicker(Platform.OS === 'ios');
+        setDateInicio(currentDate);
+        if (event.type !== 'dismissed' && selectedDate) {
+            setForm({ ...form, fecha_inicio: currentDate.toISOString().split('T')[0] });
+        }
+    };
+
+    const handleDateFinChange = (event: any, selectedDate?: Date) => {
+        const currentDate = selectedDate || dateFin;
+        setShowFinPicker(Platform.OS === 'ios');
+        setDateFin(currentDate);
+        if (event.type !== 'dismissed' && selectedDate) {
+            setForm({ ...form, fecha_fin: currentDate.toISOString().split('T')[0] });
+        }
+    };
+
     const fetchPeriodos = useCallback(async () => {
         const { data, error } = await supabase
             .from('periodos')
@@ -65,6 +98,8 @@ export default function PeriodsScreen() {
     const openCreateModal = () => {
         setEditingPeriod(null);
         setForm(emptyForm);
+        setDateInicio(new Date());
+        setDateFin(new Date());
         setModalVisible(true);
     };
 
@@ -76,6 +111,8 @@ export default function PeriodsScreen() {
             fecha_inicio: period.fecha_inicio,
             fecha_fin: period.fecha_fin,
         });
+        setDateInicio(getValidDate(period.fecha_inicio));
+        setDateFin(getValidDate(period.fecha_fin));
         setModalVisible(true);
     };
 
@@ -85,7 +122,17 @@ export default function PeriodsScreen() {
             return;
         }
 
-        // H12-CA1: Start before end
+        if (form.nombre.trim().length > 50 || !/^\d{4}$/.test(form.ano_lectivo.trim())) {
+            Alert.alert('Datos inválidos', 'Use un nombre de hasta 50 caracteres y un año de cuatro dígitos.');
+            return;
+        }
+
+        const anoLectivo = Number(form.ano_lectivo);
+        if (!Number.isInteger(anoLectivo) || anoLectivo < 1900 || anoLectivo > 9999) {
+            Alert.alert('Año inválido', 'Ingrese un año académico entre 1900 y 9999.');
+            return;
+        }
+
         if (form.fecha_inicio >= form.fecha_fin) {
             Alert.alert('Error', 'La fecha de inicio debe ser anterior a la fecha de fin.');
             return;
@@ -96,7 +143,7 @@ export default function PeriodsScreen() {
         try {
             const data = {
                 nombre: form.nombre.trim(),
-                ano_lectivo: parseInt(form.ano_lectivo),
+                ano_lectivo: anoLectivo,
                 fecha_inicio: form.fecha_inicio,
                 fecha_fin: form.fecha_fin,
             };
@@ -133,18 +180,17 @@ export default function PeriodsScreen() {
         setSaving(false);
     };
 
-    // H12-CA2: Only one active period
     const handleToggleActive = async (period: Periodo) => {
         if (period.es_activo) {
-            // Deactivate
-            const { error } = await supabase
-                .from('periodos')
-                .update({ es_activo: false })
-                .eq('id_periodo', period.id_periodo);
-
-            if (!error) fetchPeriodos();
+            const { error } = await supabase.rpc('clear_active_period', {
+                p_period_id: period.id_periodo,
+            });
+            if (error) {
+                Alert.alert('Error', 'No se pudo desactivar el período. Intente de nuevo.');
+                return;
+            }
+            await fetchPeriodos();
         } else {
-            // Deactivate all, then activate this one
             Alert.alert(
                 'Activar período',
                 `¿Establecer "${period.nombre} ${period.ano_lectivo}" como período activo? Solo puede haber un período activo.`,
@@ -153,19 +199,14 @@ export default function PeriodsScreen() {
                     {
                         text: 'Activar',
                         onPress: async () => {
-                            // Deactivate all
-                            await supabase
-                                .from('periodos')
-                                .update({ es_activo: false })
-                                .neq('id_periodo', 0);
-
-                            // Activate selected
-                            const { error } = await supabase
-                                .from('periodos')
-                                .update({ es_activo: true })
-                                .eq('id_periodo', period.id_periodo);
-
-                            if (!error) fetchPeriodos();
+                            const { error } = await supabase.rpc('set_active_period', {
+                                p_period_id: period.id_periodo,
+                            });
+                            if (error) {
+                                Alert.alert('Error', 'No se pudo activar el período. Intente de nuevo.');
+                                return;
+                            }
+                            await fetchPeriodos();
                         },
                     },
                 ]
@@ -250,12 +291,10 @@ export default function PeriodsScreen() {
                 }
             />
 
-            {/* FAB */}
             <TouchableOpacity style={styles.fab} onPress={openCreateModal} activeOpacity={0.8}>
                 <Text style={styles.fabText}>+</Text>
             </TouchableOpacity>
 
-            {/* Modal */}
             <Modal visible={modalVisible} animationType="slide" transparent>
                 <View style={styles.modalOverlay}>
                     <View style={styles.modalCard}>
@@ -269,6 +308,7 @@ export default function PeriodsScreen() {
                                 style={styles.formInput}
                                 value={form.nombre}
                                 onChangeText={(v) => setForm({ ...form, nombre: v })}
+                                maxLength={50}
                                 placeholder="Ej: I Semestre"
                                 placeholderTextColor={Colors.textTertiary}
                             />
@@ -279,34 +319,54 @@ export default function PeriodsScreen() {
                             <TextInput
                                 style={styles.formInput}
                                 value={form.ano_lectivo}
-                                onChangeText={(v) => setForm({ ...form, ano_lectivo: v })}
+                                onChangeText={(v) => setForm({ ...form, ano_lectivo: v.replace(/\D/g, '').slice(0, 4) })}
                                 placeholder="2026"
                                 placeholderTextColor={Colors.textTertiary}
                                 keyboardType="numeric"
+                                maxLength={4}
                             />
                         </View>
 
                         <View style={styles.formRow}>
                             <View style={[styles.formGroup, { flex: 1 }]}>
                                 <Text style={styles.formLabel}>Fecha inicio</Text>
-                                <TextInput
+                                <TouchableOpacity
                                     style={styles.formInput}
-                                    value={form.fecha_inicio}
-                                    onChangeText={(v) => setForm({ ...form, fecha_inicio: v })}
-                                    placeholder="YYYY-MM-DD"
-                                    placeholderTextColor={Colors.textTertiary}
-                                />
+                                    onPress={() => setShowInicioPicker(true)}
+                                >
+                                    <Text style={{ color: form.fecha_inicio ? Colors.textPrimary : Colors.textTertiary }}>
+                                        {form.fecha_inicio || "YYYY-MM-DD"}
+                                    </Text>
+                                </TouchableOpacity>
+                                {showInicioPicker && (
+                                    <DateTimePicker
+                                        value={dateInicio}
+                                        mode="date"
+                                        display="default"
+                                        onChange={handleDateInitioChange}
+                                    />
+                                )}
                             </View>
                             <View style={{ width: Spacing.md }} />
                             <View style={[styles.formGroup, { flex: 1 }]}>
                                 <Text style={styles.formLabel}>Fecha fin</Text>
-                                <TextInput
+                                <TouchableOpacity
                                     style={styles.formInput}
-                                    value={form.fecha_fin}
-                                    onChangeText={(v) => setForm({ ...form, fecha_fin: v })}
-                                    placeholder="YYYY-MM-DD"
-                                    placeholderTextColor={Colors.textTertiary}
-                                />
+                                    onPress={() => setShowFinPicker(true)}
+                                >
+                                    <Text style={{ color: form.fecha_fin ? Colors.textPrimary : Colors.textTertiary }}>
+                                        {form.fecha_fin || "YYYY-MM-DD"}
+                                    </Text>
+                                </TouchableOpacity>
+                                {showFinPicker && (
+                                    <DateTimePicker
+                                        value={dateFin}
+                                        mode="date"
+                                        display="default"
+                                        onChange={handleDateFinChange}
+                                        minimumDate={dateInicio}
+                                    />
+                                )}
                             </View>
                         </View>
 
@@ -516,10 +576,10 @@ const styles = StyleSheet.create({
         borderRadius: BorderRadius.md,
         paddingHorizontal: Spacing.lg,
         paddingVertical: Spacing.md,
-        fontSize: Typography.sizes.md,
-        color: Colors.textPrimary,
+        justifyContent: 'center',
         borderWidth: 1,
         borderColor: Colors.border,
+        minHeight: 48,
     },
     modalActions: {
         flexDirection: 'row',

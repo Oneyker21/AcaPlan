@@ -1,0 +1,25 @@
+PAQUETE POSTGRESQL COMPLETO DE ACAPLAN
+
+SQL originales incluidos (11):
+- 01_esquema_inicial/Supabase.sql
+- 02_migraciones/20260930000000_security_and_constraints.sql
+- 02_migraciones/20261004000000_sprint2_completion.sql
+- 02_migraciones/20261010000000_sprint1_role_values.sql
+- 02_migraciones/20261010000001_sprint1_career_scopes.sql
+- 02_migraciones/20261010120000_sprint2_career_groups_grids.sql
+- 02_migraciones/20261011000000_sprint2_space_inventory.sql
+- 02_migraciones/20261012000000_sprint3_assignments_restrictions_rules.sql
+- 02_migraciones/20261013000000_sprint4_schedule_drafts_validation.sql
+- 02_migraciones/20261014000000_sprint5_generation_sharing_consultation.sql
+- 02_migraciones/20261015000000_sprint6_publication_export_release.sql
+
+SQL operativo adicional:
+- 03_sql_operativos/00_vincular_administrador.sql (plantilla editable; no es parte de las 11 fuentes originales)
+
+Soporte Supabase:
+- 04_funcion_supabase/admin-users/index.ts
+- 04_funcion_supabase/config.toml
+- 05_scripts/deploy_admin_users.ps1
+- 05_scripts/verificar_paquete.ps1
+
+Los SQL originales se copiaron sin modificar. La plantilla del administrador es un script nuevo de operación. Consulte 00_LEEME.md antes de ejecutar archivos.

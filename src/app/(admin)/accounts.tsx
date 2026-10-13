@@ -8,6 +8,7 @@ import {
     FlatList,
     Modal,
     RefreshControl,
+    ScrollView,
     StyleSheet,
     Text,
     TextInput,
@@ -22,6 +23,28 @@ interface AccountForm {
     cedula: string;
     contrasena: string;
     rol: UserRol;
+    carreraIds: number[];
+}
+
+interface CareerOption {
+    id_carrera: number;
+    nombre: string;
+}
+
+const roleOptions: { value: UserRol; label: string }[] = [
+    { value: 'administrador', label: 'Administrador' },
+    { value: 'coordinacion', label: 'Coordinación' },
+    { value: 'jefatura', label: 'Jefatura de departamento' },
+    { value: 'planificacion', label: 'Planificación' },
+    { value: 'docente', label: 'Docente' },
+];
+
+function roleNeedsCareers(role: UserRol) {
+    return role === 'coordinacion' || role === 'jefatura';
+}
+
+function roleLabel(role: UserRol) {
+    return roleOptions.find((option) => option.value === role)?.label ?? role;
 }
 
 const emptyForm: AccountForm = {
@@ -30,10 +53,25 @@ const emptyForm: AccountForm = {
     cedula: '',
     contrasena: '',
     rol: 'docente',
+    carreraIds: [],
 };
+
+async function getEdgeErrorMessage(error: { message: string; context?: unknown }) {
+    if (error.context instanceof Response) {
+        try {
+            const body = await error.context.clone().json() as { error?: unknown };
+            if (typeof body.error === 'string') return body.error;
+        } catch {
+            // Fall back to the function client's message if the response is not JSON.
+        }
+    }
+    return error.message;
+}
 
 export default function AccountsScreen() {
     const [usuarios, setUsuarios] = useState<Usuario[]>([]);
+    const [carreras, setCarreras] = useState<CareerOption[]>([]);
+    const [careerIdsByUser, setCareerIdsByUser] = useState<Record<number, number[]>>({});
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
     const [modalVisible, setModalVisible] = useState(false);
@@ -43,32 +81,62 @@ export default function AccountsScreen() {
     const [searchQuery, setSearchQuery] = useState('');
 
     const fetchUsuarios = useCallback(async () => {
-        const { data, error } = await supabase
-            .from('usuarios')
-            .select('*')
-            .order('id_usuario', { ascending: true });
+        try {
+            const [{ data, error }, { data: scopes, error: scopeError }] = await Promise.all([
+                supabase
+                    .from('usuarios')
+                    .select('id_usuario, nombre, correo, cedula, rol, estado')
+                    .order('id_usuario', { ascending: true }),
+                supabase.from('usuario_carrera').select('id_usuario, id_carrera'),
+            ]);
 
-        if (!error && data) {
+            if (error || scopeError || !data || !scopes) {
+                Alert.alert('Error', 'No se pudieron cargar las cuentas y sus permisos. Revise la configuración de Sprint 1 e intente actualizar la lista.');
+                return;
+            }
+
+            const idsByUser: Record<number, number[]> = {};
+            for (const scope of scopes) {
+                (idsByUser[scope.id_usuario] ??= []).push(scope.id_carrera);
+            }
             setUsuarios(data as Usuario[]);
+            setCareerIdsByUser(idsByUser);
+        } catch {
+            Alert.alert('Error', 'No se pudieron cargar las cuentas. Intente actualizar la lista.');
+        } finally {
+            setLoading(false);
+            setRefreshing(false);
         }
-        setLoading(false);
-        setRefreshing(false);
+    }, []);
+
+    const fetchCarreras = useCallback(async () => {
+        const { data, error } = await supabase
+            .from('carreras')
+            .select('id_carrera, nombre')
+            .order('nombre', { ascending: true });
+
+        if (error || !data) {
+            Alert.alert('Error', 'No se pudo cargar la lista de carreras.');
+            return;
+        }
+        setCarreras(data as CareerOption[]);
     }, []);
 
     useEffect(() => {
-        fetchUsuarios();
-    }, [fetchUsuarios]);
+        void fetchUsuarios();
+        void fetchCarreras();
+    }, [fetchCarreras, fetchUsuarios]);
 
     const onRefresh = () => {
         setRefreshing(true);
-        fetchUsuarios();
+        void fetchUsuarios();
     };
 
     const filteredUsuarios = usuarios.filter(
         (u) =>
             u.nombre.toLowerCase().includes(searchQuery.toLowerCase()) ||
             u.correo.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            u.cedula.includes(searchQuery)
+            (u.cedula ?? '').includes(searchQuery)
     );
 
     const openCreateModal = () => {
@@ -82,85 +150,70 @@ export default function AccountsScreen() {
         setForm({
             nombre: user.nombre,
             correo: user.correo,
-            cedula: user.cedula,
+            cedula: user.cedula ?? '',
             contrasena: '',
             rol: user.rol,
+            carreraIds: careerIdsByUser[user.id_usuario] ?? [],
         });
         setModalVisible(true);
     };
 
     const handleSave = async () => {
         // Validate required fields
-        if (!form.nombre.trim() || !form.correo.trim() || !form.cedula.trim()) {
-            Alert.alert('Error', 'Nombre, correo y cédula son obligatorios.');
+        if (!form.nombre.trim() || !form.correo.trim()) {
+            Alert.alert('Error', 'Nombre y correo son obligatorios.');
             return;
         }
-        if (!editingUser && !form.contrasena.trim()) {
-            Alert.alert('Error', 'La contraseña es obligatoria para nuevos usuarios.');
+        if (form.nombre.trim().length > 100) {
+            Alert.alert('Error', 'El nombre no puede superar 100 caracteres.');
+            return;
+        }
+        if (!/^\S+@\S+\.\S+$/.test(form.correo.trim())) {
+            Alert.alert('Error', 'Ingrese un correo válido.');
+            return;
+        }
+        if (!editingUser && form.contrasena.length < 8) {
+            Alert.alert('Error', 'La contraseña debe tener al menos 8 caracteres.');
+            return;
+        }
+        if (roleNeedsCareers(form.rol) && form.carreraIds.length === 0) {
+            Alert.alert('Carreras requeridas', 'Asigne al menos una carrera a las cuentas de coordinación y jefatura.');
             return;
         }
 
         setSaving(true);
 
         try {
-            if (editingUser) {
-                // Update existing user (H03-CA2)
-                const updateData: Partial<Usuario> = {
-                    nombre: form.nombre.trim(),
-                    correo: form.correo.trim(),
-                    cedula: form.cedula.trim(),
-                    rol: form.rol,
-                };
-
-                const { error } = await supabase
-                    .from('usuarios')
-                    .update(updateData)
-                    .eq('id_usuario', editingUser.id_usuario);
-
-                if (error) {
-                    Alert.alert('Error', error.message.includes('unique')
-                        ? 'El correo o cédula ya están registrados.'
-                        : 'No se pudo actualizar la cuenta.');
-                    setSaving(false);
-                    return;
-                }
-            } else {
-                // Create new user
-                // First create in Supabase Auth
-                const { error: authError } = await supabase.auth.signUp({
-                    email: form.correo.trim(),
-                    password: form.contrasena,
-                });
-
-                if (authError) {
-                    Alert.alert('Error', 'No se pudo crear la cuenta de autenticación.');
-                    setSaving(false);
-                    return;
-                }
-
-                // Then create in usuarios table
-                const { error: dbError } = await supabase
-                    .from('usuarios')
-                    .insert({
-                        nombre: form.nombre.trim(),
-                        correo: form.correo.trim(),
-                        cedula: form.cedula.trim(),
-                        contrasena: '***', // Auth is handled by Supabase Auth
+            const { error } = await supabase.functions.invoke('admin-users', {
+                body: editingUser
+                    ? {
+                        action: 'update',
+                        id_usuario: editingUser.id_usuario,
+                        nombre: form.nombre,
+                        correo: form.correo,
+                        cedula: form.cedula.trim() || null,
                         rol: form.rol,
-                        estado: 'activo',
-                    });
+                        carrera_ids: form.carreraIds,
+                    }
+                    : {
+                        action: 'create',
+                        nombre: form.nombre,
+                        correo: form.correo,
+                        cedula: form.cedula.trim() || null,
+                        password: form.contrasena,
+                        rol: form.rol,
+                        carrera_ids: form.carreraIds,
+                    },
+            });
 
-                if (dbError) {
-                    Alert.alert('Error', dbError.message.includes('unique')
-                        ? 'El correo o cédula ya están registrados.'
-                        : 'No se pudo crear la cuenta.');
-                    setSaving(false);
-                    return;
-                }
+            if (error) {
+                Alert.alert('Error', await getEdgeErrorMessage(error));
+                setSaving(false);
+                return;
             }
 
             setModalVisible(false);
-            fetchUsuarios();
+            await fetchUsuarios();
         } catch {
             Alert.alert('Error', 'Error de conexión. Intente de nuevo.');
         }
@@ -194,13 +247,18 @@ export default function AccountsScreen() {
                     text: 'Confirmar',
                     style: newStatus === 'inactivo' ? 'destructive' : 'default',
                     onPress: async () => {
-                        const { error } = await supabase
-                            .from('usuarios')
-                            .update({ estado: newStatus })
-                            .eq('id_usuario', user.id_usuario);
+                        const { error } = await supabase.functions.invoke('admin-users', {
+                            body: {
+                                action: 'set-status',
+                                id_usuario: user.id_usuario,
+                                estado: newStatus,
+                            },
+                        });
 
                         if (!error) {
-                            fetchUsuarios();
+                            await fetchUsuarios();
+                        } else {
+                            Alert.alert('Error', await getEdgeErrorMessage(error));
                         }
                     },
                 },
@@ -213,13 +271,13 @@ export default function AccountsScreen() {
             <View style={styles.userHeader}>
                 <View style={[
                     styles.roleBadge,
-                    { backgroundColor: item.rol === 'administrador' ? Colors.accent + '20' : Colors.success + '20' }
+                    { backgroundColor: item.rol === 'administrador' ? Colors.accent + '20' : Colors.primary + '12' }
                 ]}>
                     <Text style={[
                         styles.roleText,
-                        { color: item.rol === 'administrador' ? Colors.accent : Colors.success }
+                        { color: item.rol === 'administrador' ? Colors.accent : Colors.primary }
                     ]}>
-                        {item.rol === 'administrador' ? '🔑 Admin' : '👨‍🏫 Docente'}
+                        {roleLabel(item.rol)}
                     </Text>
                 </View>
                 <View style={[
@@ -230,7 +288,14 @@ export default function AccountsScreen() {
 
             <Text style={styles.userName}>{item.nombre}</Text>
             <Text style={styles.userDetail}>📧 {item.correo}</Text>
-            <Text style={styles.userDetail}>🪪 {item.cedula}</Text>
+            {item.cedula ? <Text style={styles.userDetail}>Cédula: {item.cedula}</Text> : null}
+            {roleNeedsCareers(item.rol) && (
+                <Text style={styles.userDetail}>
+                    Carreras: {(careerIdsByUser[item.id_usuario] ?? [])
+                        .map((id) => carreras.find((career) => career.id_carrera === id)?.nombre ?? `#${id}`)
+                        .join(', ')}
+                </Text>
+            )}
 
             <View style={styles.userActions}>
                 <TouchableOpacity
@@ -309,6 +374,11 @@ export default function AccountsScreen() {
                             {editingUser ? 'Editar Cuenta' : 'Nueva Cuenta'}
                         </Text>
 
+                        <ScrollView
+                            keyboardShouldPersistTaps="handled"
+                            showsVerticalScrollIndicator={false}
+                            contentContainerStyle={styles.modalScrollContent}
+                        >
                         <View style={styles.formGroup}>
                             <Text style={styles.formLabel}>Nombre completo</Text>
                             <TextInput
@@ -334,13 +404,14 @@ export default function AccountsScreen() {
                         </View>
 
                         <View style={styles.formGroup}>
-                            <Text style={styles.formLabel}>Cédula</Text>
+                            <Text style={styles.formLabel}>Cédula (opcional)</Text>
                             <TextInput
                                 style={styles.formInput}
                                 value={form.cedula}
                                 onChangeText={(v) => setForm({ ...form, cedula: v })}
                                 placeholder="000-000000-0000A"
                                 placeholderTextColor={Colors.textTertiary}
+                                maxLength={20}
                             />
                         </View>
 
@@ -361,36 +432,61 @@ export default function AccountsScreen() {
                         <View style={styles.formGroup}>
                             <Text style={styles.formLabel}>Rol</Text>
                             <View style={styles.rolePicker}>
-                                <TouchableOpacity
-                                    style={[
-                                        styles.roleOption,
-                                        form.rol === 'docente' && styles.roleOptionActive,
-                                    ]}
-                                    onPress={() => setForm({ ...form, rol: 'docente' })}
-                                >
-                                    <Text style={[
-                                        styles.roleOptionText,
-                                        form.rol === 'docente' && styles.roleOptionTextActive,
-                                    ]}>
-                                        👨‍🏫 Docente
-                                    </Text>
-                                </TouchableOpacity>
-                                <TouchableOpacity
-                                    style={[
-                                        styles.roleOption,
-                                        form.rol === 'administrador' && styles.roleOptionActive,
-                                    ]}
-                                    onPress={() => setForm({ ...form, rol: 'administrador' })}
-                                >
-                                    <Text style={[
-                                        styles.roleOptionText,
-                                        form.rol === 'administrador' && styles.roleOptionTextActive,
-                                    ]}>
-                                        🔑 Admin
-                                    </Text>
-                                </TouchableOpacity>
+                                {roleOptions.map((option) => (
+                                    <TouchableOpacity
+                                        key={option.value}
+                                        style={[
+                                            styles.roleOption,
+                                            form.rol === option.value && styles.roleOptionActive,
+                                        ]}
+                                        onPress={() => setForm((current) => ({
+                                            ...current,
+                                            rol: option.value,
+                                            carreraIds: roleNeedsCareers(option.value) ? current.carreraIds : [],
+                                        }))}
+                                        accessibilityRole="radio"
+                                        accessibilityState={{ checked: form.rol === option.value }}
+                                    >
+                                        <Text style={[
+                                            styles.roleOptionText,
+                                            form.rol === option.value && styles.roleOptionTextActive,
+                                        ]}>
+                                            {option.label}
+                                        </Text>
+                                    </TouchableOpacity>
+                                ))}
                             </View>
                         </View>
+
+                        {roleNeedsCareers(form.rol) && (
+                            <View style={styles.formGroup}>
+                                <Text style={styles.formLabel}>Carreras autorizadas</Text>
+                                {carreras.length === 0 ? (
+                                    <Text style={styles.helperText}>Registre carreras antes de asignar este perfil.</Text>
+                                ) : carreras.map((career) => {
+                                    const selected = form.carreraIds.includes(career.id_carrera);
+                                    return (
+                                        <TouchableOpacity
+                                            key={career.id_carrera}
+                                            style={[styles.careerOption, selected && styles.careerOptionActive]}
+                                            onPress={() => setForm((current) => ({
+                                                ...current,
+                                                carreraIds: selected
+                                                    ? current.carreraIds.filter((id) => id !== career.id_carrera)
+                                                    : [...current.carreraIds, career.id_carrera],
+                                            }))}
+                                            accessibilityRole="checkbox"
+                                            accessibilityState={{ checked: selected }}
+                                        >
+                                            <Text style={[styles.careerOptionText, selected && styles.roleOptionTextActive]}>
+                                                {selected ? '✓  ' : ''}{career.nombre}
+                                            </Text>
+                                        </TouchableOpacity>
+                                    );
+                                })}
+                            </View>
+                        )}
+                        </ScrollView>
 
                         <View style={styles.modalActions}>
                             <TouchableOpacity
@@ -568,6 +664,9 @@ const styles = StyleSheet.create({
         marginBottom: Spacing.xl,
         textAlign: 'center',
     },
+    modalScrollContent: {
+        paddingBottom: Spacing.sm,
+    },
     formGroup: {
         marginBottom: Spacing.lg,
     },
@@ -589,10 +688,11 @@ const styles = StyleSheet.create({
     },
     rolePicker: {
         flexDirection: 'row',
+        flexWrap: 'wrap',
         gap: Spacing.md,
     },
     roleOption: {
-        flex: 1,
+        width: '47%',
         paddingVertical: Spacing.md,
         borderRadius: BorderRadius.md,
         alignItems: 'center',
@@ -611,6 +711,27 @@ const styles = StyleSheet.create({
     },
     roleOptionTextActive: {
         color: Colors.primary,
+    },
+    careerOption: {
+        borderWidth: 1,
+        borderColor: Colors.border,
+        borderRadius: BorderRadius.md,
+        backgroundColor: Colors.background,
+        paddingHorizontal: Spacing.md,
+        paddingVertical: Spacing.md,
+        marginBottom: Spacing.sm,
+    },
+    careerOptionActive: {
+        borderColor: Colors.primary,
+        backgroundColor: Colors.primary + '08',
+    },
+    careerOptionText: {
+        color: Colors.textSecondary,
+        fontSize: Typography.sizes.sm,
+    },
+    helperText: {
+        color: Colors.textTertiary,
+        fontSize: Typography.sizes.sm,
     },
     modalActions: {
         flexDirection: 'row',

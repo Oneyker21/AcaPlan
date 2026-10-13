@@ -54,6 +54,42 @@ export default function AdminLayout() {
                 }}
             />
             <Tabs.Screen
+                name="sections"
+                options={{
+                    title: 'Secciones',
+                    headerTitle: 'Gestión de Secciones',
+                    tabBarIcon: ({ color }) => <Text style={{ fontSize: 20, color }}>📚</Text>,
+                }}
+            />
+            <Tabs.Screen
+                name="blocks"
+                options={{ href: null }}
+            />
+            <Tabs.Screen
+                name="schedule"
+                options={{ href: null, title: 'Planificación' }}
+            />
+            <Tabs.Screen
+                name="consultation"
+                options={{ href: null, title: 'Consulta de horarios' }}
+            />
+            <Tabs.Screen
+                name="academic-assignments"
+                options={{ href: null, title: 'Asignación académica' }}
+            />
+            <Tabs.Screen
+                name="assignment-import"
+                options={{ href: null, title: 'Importar asignación' }}
+            />
+            <Tabs.Screen
+                name="catalogs"
+                options={{ href: null, title: 'Catálogos' }}
+            />
+            <Tabs.Screen
+                name="inventory-import"
+                options={{ href: null, title: 'Importar espacios' }}
+            />
+            <Tabs.Screen
                 name="profile"
                 options={{
                     title: 'Perfil',

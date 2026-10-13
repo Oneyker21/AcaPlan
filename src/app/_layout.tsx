@@ -1,44 +1,92 @@
 import { AuthProvider, useAuth } from '@/context/AuthContext';
-import { Slot, useRouter, useSegments } from 'expo-router';
+import { Colors, Spacing, Typography } from '@/constants/theme';
+import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
+import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
-SplashScreen.preventAutoHideAsync();
+void SplashScreen.preventAutoHideAsync();
 
 function RootLayoutNav() {
-  const { session, role, loading } = useAuth();
-  const segments = useSegments();
-  const router = useRouter();
+  const { session, profile, role, loading, profileError, retryProfile, signOut, passwordRecovery } = useAuth();
 
   useEffect(() => {
-    if (loading) return;
+    if (!loading) void SplashScreen.hideAsync();
+  }, [loading]);
 
-    const inAuthGroup = segments[0] === '(auth)';
+  if (loading) {
+    return (
+      <View style={styles.centered}>
+        <StatusBar style="auto" />
+        <ActivityIndicator size="large" color={Colors.primary} />
+      </View>
+    );
+  }
 
-    if (!session) {
-      // Not authenticated → go to login
-      if (!inAuthGroup) {
-        router.replace('/(auth)/login');
-      }
-    } else if (role) {
-      // Authenticated with role → redirect to correct dashboard
-      if (inAuthGroup) {
-        if (role === 'administrador') {
-          router.replace('/(admin)');
-        } else {
-          router.replace('/(docente)');
-        }
-      }
-    }
+  if (session && !role && !passwordRecovery) {
+    return (
+      <View style={styles.centered}>
+        <StatusBar style="auto" />
+        <Text style={styles.errorTitle}>No se pudo validar su cuenta</Text>
+        <Text style={styles.errorMessage}>{profileError ?? 'Intente de nuevo o cierre sesión.'}</Text>
+        <TouchableOpacity style={styles.button} onPress={() => void retryProfile()}>
+          <Text style={styles.buttonText}>Reintentar</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.signOutButton} onPress={() => void signOut()}>
+          <Text style={styles.signOutText}>Cerrar sesión</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
 
-    SplashScreen.hideAsync();
-  }, [session, role, loading, segments]);
+  if (session && role && role !== 'administrador' && role !== 'docente' && role !== 'planificacion' && role !== 'coordinacion' && role !== 'jefatura' && !passwordRecovery) {
+    const roleName = {
+      coordinacion: 'Coordinación',
+      jefatura: 'Jefatura de departamento',
+      planificacion: 'Planificación',
+      administrador: 'Administración',
+      docente: 'Docencia',
+    }[role];
+
+    return (
+      <View style={styles.centered}>
+        <StatusBar style="auto" />
+        <Text style={styles.errorTitle}>Hola, {profile?.nombre ?? 'bienvenido'}</Text>
+        <Text style={styles.roleLabel}>{roleName}</Text>
+        <Text style={styles.errorMessage}>
+          Su cuenta está habilitada. El espacio de trabajo de este perfil se incorporará en los próximos sprints.
+        </Text>
+        <TouchableOpacity style={styles.signOutButton} onPress={() => void signOut()}>
+          <Text style={styles.signOutText}>Cerrar sesión</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
 
   return (
     <>
       <StatusBar style="auto" />
-      <Slot />
+      <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Protected guard={!session || passwordRecovery}>
+          <Stack.Screen name="(auth)" />
+        </Stack.Protected>
+        <Stack.Protected guard={Boolean(session) && role === 'administrador' && !passwordRecovery}>
+          <Stack.Screen name="(admin)" />
+        </Stack.Protected>
+        <Stack.Protected guard={Boolean(session) && role === 'docente' && !passwordRecovery}>
+          <Stack.Screen name="(docente)" />
+        </Stack.Protected>
+        <Stack.Protected guard={Boolean(session) && role === 'planificacion' && !passwordRecovery}>
+          <Stack.Screen name="(planificacion)" />
+        </Stack.Protected>
+        <Stack.Protected guard={Boolean(session) && role === 'coordinacion' && !passwordRecovery}>
+          <Stack.Screen name="(coordinacion)" />
+        </Stack.Protected>
+        <Stack.Protected guard={Boolean(session) && role === 'jefatura' && !passwordRecovery}>
+          <Stack.Screen name="(jefatura)" />
+        </Stack.Protected>
+      </Stack>
     </>
   );
 }
@@ -50,3 +98,53 @@ export default function RootLayout() {
     </AuthProvider>
   );
 }
+
+const styles = StyleSheet.create({
+  centered: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: Colors.background,
+    padding: Spacing.xl,
+  },
+  errorTitle: {
+    color: Colors.textPrimary,
+    fontSize: Typography.sizes.xl,
+    fontWeight: '700',
+    textAlign: 'center',
+    marginTop: Spacing.lg,
+  },
+  errorMessage: {
+    color: Colors.textSecondary,
+    fontSize: Typography.sizes.md,
+    textAlign: 'center',
+    marginTop: Spacing.sm,
+  },
+  roleLabel: {
+    color: Colors.primary,
+    fontSize: Typography.sizes.md,
+    fontWeight: '600',
+    marginTop: Spacing.sm,
+  },
+  button: {
+    backgroundColor: Colors.primary,
+    borderRadius: 10,
+    paddingHorizontal: Spacing.xl,
+    paddingVertical: Spacing.md,
+    marginTop: Spacing.xl,
+  },
+  buttonText: {
+    color: Colors.white,
+    fontSize: Typography.sizes.md,
+    fontWeight: '600',
+  },
+  signOutButton: {
+    padding: Spacing.md,
+    marginTop: Spacing.sm,
+  },
+  signOutText: {
+    color: Colors.textLink,
+    fontSize: Typography.sizes.md,
+    fontWeight: '600',
+  },
+});
