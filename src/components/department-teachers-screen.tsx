@@ -47,8 +47,8 @@ export default function DepartmentTeachersScreen() {
     const loadDepartmentData = useCallback(async () => {
         if (!profile) return;
         try {
-            // First find the department where this user is head
-            // Try via RPC
+            // Busca el departamento asociado al usuario que tiene sesión iniciada.
+            // Primero consulta la función de administración académica.
             const { data: depts, error: deptsError } = await supabase.rpc('pwa_jefatura_academica', {
                 action: 'departments.list',
                 payload: {},
@@ -60,7 +60,7 @@ export default function DepartmentTeachersScreen() {
                 // If user is jefe, find their department; if admin, pick the first department or allow selecting
                 currentDept = depts.find((d: any) => d.id_jefe === profile.id_usuario) || depts[0] || null;
             } else {
-                // Direct fallback
+                // Si la consulta anterior falla, intenta obtener la jefatura directamente.
                 const { data: rawJefatura } = await supabase
                     .from('pwa_departamento_jefaturas')
                     .select('id_departamento')
