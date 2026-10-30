@@ -72,6 +72,7 @@ export default function SharedSchedulesScreen() {
         setPeriodId((current) => current ?? list[0]?.id_periodo ?? null);
     }, []);
 
+    // La consulta presenta versiones compartidas o publicadas del período seleccionado.
     const loadVersions = useCallback(async () => {
         if (!periodId) { setVersions([]); setVersionId(null); return; }
         const { data, error } = await supabase.from('versiones_horario')
@@ -127,6 +128,7 @@ export default function SharedSchedulesScreen() {
         && (careerId === null || section?.id_carrera === careerId))
         .filter((section, index, all) => all.findIndex((item) => item?.id_seccion === section?.id_seccion) === index)
         .sort((a, b) => a.codigo.localeCompare(b.codigo)), [careerId, rows]);
+    // Las opciones de docentes se limitan a las clases de la carrera y el grupo elegidos.
     const teacherOptions = useMemo(() => {
         const ids = new Set(rows.filter((row) => groupId === null || row.secciones?.id_seccion === groupId)
             .filter((row) => careerId === null || row.secciones?.id_carrera === careerId)
@@ -136,6 +138,7 @@ export default function SharedSchedulesScreen() {
             .map((teacher) => [teacher.id_docente, teacher.nombre])).entries()]
             .sort((a, b) => a[1].localeCompare(b[1]));
     }, [careerId, groupId, rows, teacherLinks]);
+    // Combina los filtros de la pantalla y ordena las clases por día y hora.
     const filteredRows = useMemo(() => rows.filter((row) => {
         const rowTeachers = teacherLinks.filter((teacher) => teacher.id_horario === row.id_horario);
         const haystack = `${row.secciones?.codigo ?? ''} ${row.secciones?.carreras?.nombre ?? ''} ${row.asignaturas?.codigo ?? ''} ${row.asignaturas?.nombre ?? ''} ${row.aulas?.codigo ?? ''}`.toLocaleLowerCase();
@@ -149,6 +152,7 @@ export default function SharedSchedulesScreen() {
         || String(left.hora_inicio_snapshot ?? '').localeCompare(String(right.hora_inicio_snapshot ?? ''))),
     [careerId, day, groupId, rows, search, shift, teacherId, teacherLinks]);
 
+    // La decisión se registra sobre la versión compartida mediante una función de Supabase.
     const decide = async (approved: boolean) => {
         if (!versionId || !selectedVersion || selectedVersion.estado !== 'compartido' || reviewBusy) return;
         setReviewBusy(true);
