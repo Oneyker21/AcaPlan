@@ -158,10 +158,12 @@ export default function RoomInventoryImportScreen() {
         return rows;
     }, [includedSheets, mappings, resources, sheets]);
 
+    // Solo las hojas seleccionadas participan en la vista previa y la importación.
     const selectedRows = previewRows.filter((row) => includedSheets[row.sheet]);
     const issueCount = selectedRows.reduce((total, row) => total + row.errors.length, 0);
     const canImport = selectedRows.length > 0 && issueCount === 0 && !resourcesLoading && !saving && !reading;
 
+    // Lee las hojas del archivo y toma su primera fila no vacía como encabezado.
     const chooseFile = async () => {
         setReading(true);
         try {
@@ -240,6 +242,7 @@ export default function RoomInventoryImportScreen() {
         setPickerField(null);
     };
 
+    // El inventario se envía únicamente cuando las filas seleccionadas no tienen errores.
     const confirmImport = async () => {
         if (!canImport) return;
         setSaving(true);
