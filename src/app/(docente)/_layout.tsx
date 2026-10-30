@@ -1,4 +1,5 @@
 import { Colors } from '@/constants/theme';
+import { HeaderLogoutButton } from '@/components/header-logout-button';
 import { Tabs } from 'expo-router';
 import { Text } from 'react-native';
 
@@ -34,6 +35,7 @@ export default function DocenteLayout() {
                 options={{
                     title: 'Mi Horario',
                     headerTitle: 'AcaPlan',
+                    headerRight: () => <HeaderLogoutButton />,
                     tabBarIcon: ({ color }) => <Text style={{ fontSize: 20, color }}>📅</Text>,
                 }}
             />

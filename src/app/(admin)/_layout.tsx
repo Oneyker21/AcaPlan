@@ -1,4 +1,5 @@
 import { Colors } from '@/constants/theme';
+import { HeaderLogoutButton } from '@/components/header-logout-button';
 import { Tabs } from 'expo-router';
 import { Text } from 'react-native';
 
@@ -34,6 +35,7 @@ export default function AdminLayout() {
                 options={{
                     title: 'Inicio',
                     headerTitle: 'AcaPlan · Admin',
+                    headerRight: () => <HeaderLogoutButton />,
                     tabBarIcon: ({ color }) => <Text style={{ fontSize: 20, color }}>🏠</Text>,
                 }}
             />
@@ -88,6 +90,14 @@ export default function AdminLayout() {
             <Tabs.Screen
                 name="inventory-import"
                 options={{ href: null, title: 'Importar espacios' }}
+            />
+            <Tabs.Screen
+                name="departments"
+                options={{ href: null, title: 'Departamentos' }}
+            />
+            <Tabs.Screen
+                name="ai-generator"
+                options={{ href: null, title: 'Generador con IA' }}
             />
             <Tabs.Screen
                 name="profile"

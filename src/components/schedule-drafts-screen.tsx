@@ -1,6 +1,7 @@
 import { BorderRadius, Colors, Shadows, Spacing, Typography } from '@/constants/theme';
 import { supabase } from '@/lib/supabase';
 import { DiaSemana } from '@/types/database';
+import { exportScheduleToExcel } from '@/utils/schedule-excel-export';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
     ActivityIndicator,
@@ -433,6 +434,42 @@ export default function ScheduleDraftsScreen() {
             issue.expected !== undefined ? `${issue.scheduled ?? 0}/${issue.expected} sesiones ubicadas` : null].filter(Boolean).map((part, itemIndex) => <Text key={itemIndex} style={styles.issueDetail}>{part}</Text>)}
     </View>;
 
+    const handleExportDraftExcel = async () => {
+        if (!visibleRows.length) {
+            Alert.alert('Aviso', 'No hay clases en esta versión para exportar.');
+            return;
+        }
+        try {
+            setBusy(true);
+            await exportScheduleToExcel({
+                periodoNombre: selectedPeriod?.nombre ?? 'II Semestre 2026',
+                turno: shift === 'todos' ? 'Matutino' : shift,
+                clases: visibleRows.map((r) => {
+                    const teacherIds = [...new Set([r.id_docente, ...(r.horario_docente ?? []).map((t) => t.id_docente)])];
+                    const teacherLabel = teacherIds.map((id) => teacherNames[id] ?? `Docente ${id}`).join(', ');
+                    return {
+                        seccion_codigo: r.secciones?.codigo ?? 'Grupo',
+                        asignatura_nombre: r.asignaturas?.nombre ?? r.asignaturas?.codigo ?? '',
+                        docente_nombre: teacherLabel,
+                        aula_codigo: r.aulas?.codigo,
+                        dia: r.dia_snapshot ?? r.bloques_clase?.dia,
+                        hora_inicio: r.hora_inicio_snapshot ?? r.bloques_clase?.hora_inicio,
+                        hora_fin: r.hora_fin_snapshot ?? r.bloques_clase?.hora_fin,
+                    };
+                }),
+                secciones: groups.map((g) => ({
+                    codigo: g.codigo,
+                    carrera_nombre: g.carreras?.nombre,
+                })),
+            });
+        } catch (err: any) {
+            console.error('[EXCEL] Error exportando borrador:', err);
+            Alert.alert('Error', 'No se pudo exportar el horario a Excel.');
+        } finally {
+            setBusy(false);
+        }
+    };
+
     const selectedPeriod = periods.find((period) => period.id_periodo === periodId);
     if (loading) return <View style={styles.centered}><ActivityIndicator size="large" color={Colors.primary} /></View>;
 
@@ -484,6 +521,11 @@ export default function ScheduleDraftsScreen() {
                     {selectedVersion?.estado === 'aprobado' ? <TouchableOpacity style={styles.primaryButton} disabled={busy || !['valida', 'con_avisos'].includes(selectedVersion.estado_validacion)} onPress={publishVersion}>
                         {busy ? <ActivityIndicator color={Colors.white} /> : <Text style={styles.primaryText}>Publicar horario oficial del período</Text>}
                     </TouchableOpacity> : null}
+                    {selectedVersion && visibleRows.length > 0 ? (
+                        <TouchableOpacity style={[styles.secondaryButton, { borderColor: '#059669', marginTop: Spacing.sm }]} disabled={busy} onPress={() => void handleExportDraftExcel()}>
+                            <Text style={[styles.secondaryText, { color: '#059669' }]}>📊 Descargar versión en Excel (.xlsx)</Text>
+                        </TouchableOpacity>
+                    ) : null}
                 </View>
                 <Text style={styles.label}>Mostrar</Text>
                 <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chipRow}>
