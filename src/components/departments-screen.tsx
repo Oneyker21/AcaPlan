@@ -39,7 +39,7 @@ export default function DepartmentsScreen() {
 
     const loadData = useCallback(async () => {
         try {
-            // First try calling the RPC pwa_jefatura_academica
+            // Consulta los departamentos mediante la función de administración académica.
             const { data: rpcDepts, error: rpcError } = await supabase.rpc('pwa_jefatura_academica', {
                 action: 'departments.list',
                 payload: {},
