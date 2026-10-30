@@ -142,6 +142,7 @@ export default function RestrictionsScreen() {
         setFormVisible(true);
     };
 
+    // Valida los datos y consulta las clases que podrían verse afectadas antes de guardar.
     const getPreview = async (): Promise<Impact[] | null> => {
         if (!periodId || !careerId) {
             Alert.alert('Faltan datos', 'Seleccione un período y una carrera.');
