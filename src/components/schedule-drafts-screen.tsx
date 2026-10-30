@@ -196,6 +196,7 @@ export default function ScheduleDraftsScreen() {
         const dayOrder = DAYS.indexOf(left.dia_snapshot ?? left.bloques_clase?.dia ?? 'Lunes') - DAYS.indexOf(right.dia_snapshot ?? right.bloques_clase?.dia ?? 'Lunes');
         return dayOrder || String(left.hora_inicio_snapshot ?? left.bloques_clase?.hora_inicio ?? '').localeCompare(String(right.hora_inicio_snapshot ?? right.bloques_clase?.hora_inicio ?? ''));
     });
+    // Enumera las sesiones de cada componente que todavía no están en el borrador.
     const candidates: Candidate[] = useMemo(() => componentsForPeriod.flatMap((component) => {
         const assignment = assignmentMap.get(component.id_asignacion_academica);
         const group = assignment ? groupsMap.get(assignment.id_seccion) : undefined;
@@ -206,12 +207,14 @@ export default function ScheduleDraftsScreen() {
             .map((session) => ({ component, assignment, session, group, subject }));
     }), [assignmentMap, componentsForPeriod, groupsMap, scheduleRows, shift, subjectsMap]);
 
+    // La lista de aulas se filtra por capacidad, recursos y sede de la sección.
     const roomOptions = selection ? rooms.filter((room) => {
         const needs = [...(selection.component.asignacion_componente_recurso ?? []).map((item) => item.id_recurso), ...(subjectResources[selection.subject.id_asignatura] ?? [])];
         const resourcesPresent = needs.every((resourceId) => (roomResources[room.id_aula] ?? []).includes(resourceId));
         const hasSite = !selection.group.sede || room.pabellones?.sede?.trim().toLocaleLowerCase() === selection.group.sede.trim().toLocaleLowerCase();
         return room.capacidad >= selection.group.cantidad_estudiantes && resourcesPresent && hasSite;
     }).sort((a, b) => a.codigo.localeCompare(b.codigo)) : [];
+    // Los bloques ofrecidos deben coincidir con modalidad, turno y duración de la sesión.
     const blockOptions = selection ? blocks.filter((block) =>
         block.modalidad === selection.group.modalidad
         && block.turno === selection.group.turno
@@ -239,6 +242,7 @@ export default function ScheduleDraftsScreen() {
         Alert.alert('Borrador creado', 'La versión anterior se conservó y las clases fijadas se copiaron.');
     };
 
+    // La validación se solicita a Supabase y sus hallazgos se muestran en la pantalla.
     const validateVersion = async () => {
         if (!versionId || busy) return;
         setBusy(true);
