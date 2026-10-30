@@ -1,21 +1,37 @@
-import { AuthProvider, useAuth } from '@/context/AuthContext';
 import { Colors, Spacing, Typography } from '@/constants/theme';
+import { AuthProvider, useAuth } from '@/context/AuthContext';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
-void SplashScreen.preventAutoHideAsync();
+void SplashScreen.preventAutoHideAsync().catch(() => {});
 
 function RootLayoutNav() {
   const { session, profile, role, loading, profileError, retryProfile, signOut, passwordRecovery } = useAuth();
 
   useEffect(() => {
-    if (!loading) void SplashScreen.hideAsync();
+    console.log('[LAYOUT] Estado actual:', {
+      loading,
+      hasSession: !!session,
+      email: session?.user?.email ?? null,
+      role,
+      profileError,
+      passwordRecovery,
+      profileName: profile?.nombre ?? null,
+    });
+  }, [loading, session, role, profileError, passwordRecovery, profile]);
+
+  useEffect(() => {
+    if (!loading) {
+      console.log('[LAYOUT] Loading terminado, ocultando splash screen');
+      void SplashScreen.hideAsync().catch(() => {});
+    }
   }, [loading]);
 
   if (loading) {
+    console.log('[LAYOUT] ⏳ Mostrando loading spinner...');
     return (
       <View style={styles.centered}>
         <StatusBar style="auto" />
@@ -25,6 +41,7 @@ function RootLayoutNav() {
   }
 
   if (session && !role && !passwordRecovery) {
+    console.log('[LAYOUT] ⚠️ Sesión activa pero SIN rol. Mostrando error de validación. ProfileError:', profileError);
     return (
       <View style={styles.centered}>
         <StatusBar style="auto" />
@@ -41,6 +58,7 @@ function RootLayoutNav() {
   }
 
   if (session && role && role !== 'administrador' && role !== 'docente' && role !== 'planificacion' && role !== 'coordinacion' && role !== 'jefatura' && !passwordRecovery) {
+    console.log('[LAYOUT] Rol no soportado aún:', role);
     const roleName = {
       coordinacion: 'Coordinación',
       jefatura: 'Jefatura de departamento',
@@ -63,6 +81,16 @@ function RootLayoutNav() {
       </View>
     );
   }
+
+  const routeTarget = !session || passwordRecovery
+    ? '(auth)'
+    : role === 'administrador' ? '(admin)'
+      : role === 'docente' ? '(docente)'
+        : role === 'planificacion' ? '(planificacion)'
+          : role === 'coordinacion' ? '(coordinacion)'
+            : role === 'jefatura' ? '(jefatura)'
+              : 'unknown';
+  console.log('[LAYOUT] → Navegando a grupo:', routeTarget, '| Rol:', role ?? 'sin sesión');
 
   return (
     <>

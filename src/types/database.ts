@@ -137,3 +137,27 @@ export interface VersionHorario {
     publicada_por?: number | null;
     fecha_publicada?: string | null;
 }
+
+// Sprint 3: Departamentos y Jefaturas
+export interface Departamento {
+    id_departamento: number;
+    nombre: string;
+    activo: boolean;
+    id_jefe?: number | null;
+    jefe_nombre?: string | null;
+    id_asignaturas?: number[];
+    componentes?: { id_asignatura: number; codigo: string; nombre: string }[];
+}
+
+export type TipoDocente = 'planta' | 'horario';
+
+export interface DocenteDepartamento {
+    id_docente: number;
+    nombre: string;
+    correo: string;
+    cedula: string | null;
+    estado: GeneralEstado;
+    id_departamento: number;
+    tipo_docente: TipoDocente | null;
+    componentes: { id_asignatura: number; codigo: string; nombre: string }[];
+}

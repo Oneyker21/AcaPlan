@@ -6,12 +6,12 @@ La aplicación está desarrollada con React Native, Expo y TypeScript. Utiliza E
 
 ## Generación de horarios
 
-La app incluye una opción para **completar automáticamente una propuesta de horario** desde la pantalla de borradores. La pantalla solicita la generación a la función `generate_schedule_draft`, definida en la migración de Supabase `20261014000000_sprint5_generation_sharing_consultation.sql`; la búsqueda se ejecuta en la base de datos.
+La aplicación dispone de dos caminos de generación de propuestas:
 
-La función busca combinaciones de bloques y aulas para las sesiones oficiales pendientes. Considera datos como docentes asignados, duración, turno, capacidad, sede y recursos del aula, además de las comprobaciones aplicadas al guardar. Conserva las sesiones ya ubicadas y devuelve las que no pudo colocar, junto con el resultado de validación.
+- **Generador de horarios:** la pantalla `ai-schedule-generator-screen.tsx` consulta información de Supabase y utiliza `schedule-ai-solver.ts` en la aplicación. El algoritmo explora alternativas mediante búsqueda con retroceso y una heurística de selección; permite fijar clases o días y configurar si se consideran aulas. Tiene límites de tiempo y búsqueda y puede devolver resultados sin demostrar que sean óptimos. También incluye una opción de exportación a Excel.
+- **Completar un borrador:** desde la pantalla de borradores se llama a `generate_schedule_draft`, función definida en la migración `20261014000000_sprint5_generation_sharing_consultation.sql`. Esta función de Supabase busca ubicaciones para sesiones pendientes, conserva las sesiones ya colocadas y devuelve las que no pudo ubicar y el resultado de validación.
 
-La implementación revisada realiza una búsqueda ordenada de candidatos con un límite de intentos; no se identificó en ella un modelo de IA ni OR-Tools. Puede dejar sesiones pendientes y no garantiza encontrar la mejor solución. La propuesta permanece como borrador y debe revisarse y validarse antes de compartirla o publicarla. Su funcionamiento real depende de la configuración de Supabase, los permisos y los datos disponibles; esta descripción se basa en la revisión del código, no en una prueba con datos reales.
-
+Ambos caminos dependen de la configuración, los permisos y los datos académicos disponibles. Las propuestas deben revisarse antes de compartirlas o publicarlas. Esta descripción proviene de la revisión del código; no equivale a una prueba con datos reales.
 ## Requisitos
 
 - Node.js y npm instalados.
@@ -81,3 +81,4 @@ Si `npm install` muestra vulnerabilidades, consulta los detalles con `npm audit`
 ## Colaboración
 
 Antes de empezar, verifica que estés trabajando en la rama acordada y descarga los cambios del equipo. No compartas credenciales ni subas archivos de entorno al repositorio. Consulta con el equipo antes de modificar la configuración o ejecutar migraciones sobre una base compartida.
+

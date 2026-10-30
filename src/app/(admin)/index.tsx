@@ -79,10 +79,12 @@ export default function AdminDashboard() {
                         { label: 'Secciones Académicas', icon: '📚', desc: 'Gestionar secciones y asignaturas', route: '/(admin)/sections' },
                         { label: 'Bloques de Clase', icon: '⏰', desc: 'Configurar duración y recesos', route: '/(admin)/blocks' },
                         { label: 'Catálogos', icon: '🏫', desc: 'Gestionar carreras, asignaturas, pabellones y aulas', route: '/(admin)/catalogs' },
+                        { label: 'Generador de Horarios con IA', icon: '🤖', desc: 'Búsqueda inteligente sin cruces (CSP y optimización)', route: '/(admin)/ai-generator' },
                         { label: 'Planificar Horarios', icon: '🗓️', desc: 'Asignar recursos y publicar horarios', route: '/(admin)/schedule' },
                         { label: 'Consultar Horarios', icon: '👀', desc: 'Revisar propuestas compartidas y horarios oficiales', route: '/(admin)/consultation' },
                         { label: 'Asignación Académica', icon: '🧑‍🏫', desc: 'Registrar grupos, docentes y necesidades', route: '/(admin)/academic-assignments' },
                         { label: 'Importar Asignación', icon: '📥', desc: 'Validar el archivo oficial en vista previa', route: '/(admin)/assignment-import' },
+                        { label: 'Departamentos y Jefaturas', icon: '🏛️', desc: 'Gestionar departamentos, jefes y asignaturas', route: '/(admin)/departments' },
                     ].map((action, index) => (
                         <TouchableOpacity key={index} style={styles.actionCard} onPress={() => router.push(action.route as any)} activeOpacity={0.7}>
                             <Text style={styles.actionIcon}>{action.icon}</Text>

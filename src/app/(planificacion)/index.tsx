@@ -1,8 +1,9 @@
 import { BorderRadius, Colors, Shadows, Spacing, Typography } from '@/constants/theme';
+import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { Link } from 'expo-router';
 import React, { useCallback, useEffect, useState } from 'react';
-import { ActivityIndicator, FlatList, RefreshControl, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Alert, FlatList, RefreshControl, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 interface PlanningRoom {
@@ -31,12 +32,24 @@ interface Resource {
 }
 
 export default function PlanningHomeScreen() {
+    const { signOut } = useAuth();
     const [rooms, setRooms] = useState<PlanningRoom[]>([]);
     const [pavilions, setPavilions] = useState<Pavilion[]>([]);
     const [resources, setResources] = useState<Resource[]>([]);
     const [roomResources, setRoomResources] = useState<RoomResourceLink[]>([]);
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
+
+    const handleSignOut = () => {
+        Alert.alert(
+            'Cerrar Sesión',
+            '¿Estás seguro de que deseas cerrar sesión?',
+            [
+                { text: 'Cancelar', style: 'cancel' },
+                { text: 'Cerrar Sesión', style: 'destructive', onPress: () => void signOut() },
+            ]
+        );
+    };
 
     const fetchInventory = useCallback(async () => {
         try {
@@ -103,7 +116,9 @@ export default function PlanningHomeScreen() {
                     <Link href="/(planificacion)/blocks" asChild><TouchableOpacity style={styles.actionButton}><Text style={styles.actionText}>Cuadrículas de horario</Text></TouchableOpacity></Link>
                     <Link href="/(planificacion)/planning-rules" asChild><TouchableOpacity style={styles.actionButton}><Text style={styles.actionText}>Reglas del horario</Text></TouchableOpacity></Link>
                     <Link href="/(planificacion)/schedule" asChild><TouchableOpacity style={styles.actionButton}><Text style={styles.actionText}>Borradores de horario</Text></TouchableOpacity></Link>
+                    <Link href={"/(planificacion)/ai-generator" as any} asChild><TouchableOpacity style={[styles.actionButton, { backgroundColor: '#1E40AF' }]}><Text style={[styles.actionText, { color: Colors.white }]}>🤖 Generador con IA</Text></TouchableOpacity></Link>
                     <Link href="/(planificacion)/consultation" asChild><TouchableOpacity style={styles.actionButton}><Text style={styles.actionText}>Consultar horarios</Text></TouchableOpacity></Link>
+                    <TouchableOpacity style={[styles.actionButton, styles.signOutAction]} onPress={handleSignOut}><Text style={styles.signOutActionText}>🚪 Cerrar Sesión</Text></TouchableOpacity>
                 </View>
                 <Link href="/(planificacion)/inventory-import" asChild>
                     <TouchableOpacity style={styles.importButton}>
@@ -132,6 +147,8 @@ const styles = StyleSheet.create({
     actions: { flexDirection: 'row', flexWrap: 'wrap', gap: Spacing.sm, marginTop: Spacing.lg },
     actionButton: { alignItems: 'center', backgroundColor: Colors.white, borderColor: Colors.border, borderRadius: BorderRadius.md, borderWidth: 1, justifyContent: 'center', minHeight: 42, paddingHorizontal: Spacing.md },
     actionText: { color: Colors.primary, fontSize: Typography.sizes.xs, fontWeight: '700' },
+    signOutAction: { borderColor: Colors.error, backgroundColor: Colors.white },
+    signOutActionText: { color: Colors.error, fontSize: Typography.sizes.xs, fontWeight: '700' },
     importButton: { alignItems: 'center', backgroundColor: Colors.primary, borderRadius: BorderRadius.md, marginTop: Spacing.lg, minHeight: 46, justifyContent: 'center', paddingHorizontal: Spacing.lg, paddingVertical: Spacing.md },
     importButtonText: { color: Colors.white, fontSize: Typography.sizes.sm, fontWeight: '700' },
     listContent: { paddingHorizontal: Spacing.lg, paddingBottom: Spacing.huge },

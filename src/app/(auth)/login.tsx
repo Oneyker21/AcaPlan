@@ -19,23 +19,36 @@ export default function LoginScreen() {
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
-    const { signIn } = useAuth();
+    const { signIn, loginError, clearLoginError } = useAuth();
     const router = useRouter();
 
     const handleLogin = async () => {
         setError('');
 
         if (!correo.trim() || !contrasena.trim()) {
+            console.log('[LOGIN] ⚠️ Campos vacíos, no se intenta login');
             setError('Por favor complete todos los campos.');
+            clearLoginError();
             return;
         }
 
+        console.log('[LOGIN] Iniciando login para:', correo.trim());
         setLoading(true);
-        const { error: signInError } = await signIn(correo.trim(), contrasena);
-        setLoading(false);
+        let signInError: string | null;
+        try {
+            ({ error: signInError } = await signIn(correo.trim(), contrasena));
+        } catch (err) {
+            console.error('[LOGIN] ❌ Excepción en signIn:', err);
+            signInError = 'No se pudo completar el inicio de sesión. Revise su conexión e intente de nuevo.';
+        } finally {
+            setLoading(false);
+        }
 
         if (signInError) {
+            console.error('[LOGIN] ❌ Error mostrado al usuario:', signInError);
             setError(signInError);
+        } else {
+            console.log('[LOGIN] ✅ Login exitoso, la navegación la maneja el root layout guard');
         }
         // Navigation is handled automatically by the root layout guard
     };
@@ -66,9 +79,9 @@ export default function LoginScreen() {
                 <View style={styles.card}>
                     <Text style={styles.cardTitle}>Iniciar Sesión</Text>
 
-                    {error ? (
+                    {error || loginError ? (
                         <View style={styles.errorContainer}>
-                            <Text style={styles.errorText}>⚠ {error}</Text>
+                            <Text style={styles.errorText}>⚠ {error || loginError}</Text>
                         </View>
                     ) : null}
 
@@ -79,7 +92,11 @@ export default function LoginScreen() {
                             placeholder="correo@unan.edu.ni"
                             placeholderTextColor={Colors.textTertiary}
                             value={correo}
-                            onChangeText={setCorreo}
+                            onChangeText={(value) => {
+                                setCorreo(value);
+                                setError('');
+                                clearLoginError();
+                            }}
                             keyboardType="email-address"
                             autoCapitalize="none"
                             autoCorrect={false}
@@ -95,7 +112,11 @@ export default function LoginScreen() {
                                 placeholder="••••••••"
                                 placeholderTextColor={Colors.textTertiary}
                                 value={contrasena}
-                                onChangeText={setContrasena}
+                                onChangeText={(value) => {
+                                    setContrasena(value);
+                                    setError('');
+                                    clearLoginError();
+                                }}
                                 secureTextEntry={!showPassword}
                                 editable={!loading}
                             />
