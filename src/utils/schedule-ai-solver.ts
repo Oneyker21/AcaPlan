@@ -393,7 +393,7 @@ export function solveScheduleAI({
         };
     }
 
-    // Sort tasks using MRV (Minimum Remaining Values heuristic)
+    // Primero se intentan las sesiones con menos opciones de horario disponibles (heurística MRV).
     tasks.sort((a, b) => a.candidates.length - b.candidates.length);
 
     let bestSolution: PlacedCandidate[] = [...placed];
@@ -408,7 +408,7 @@ export function solveScheduleAI({
         if (lockedDaysSet.has(cand.block.dia)) return true;
 
         for (const p of currentPlaced) {
-            // Check only if same day and time intervals overlap
+            // Solo hay que comprobar choques entre sesiones del mismo día que se traslapan.
             if (p.candidate.block.dia !== cand.block.dia) continue;
             if (
                 !intervalsOverlap(
@@ -467,7 +467,7 @@ export function solveScheduleAI({
         return false;
     }
 
-    // Calculate student gap score (fewer gaps = better)
+    // Cuenta los días de cada sección cuyas sesiones colocadas quedan continuas, sin huecos.
     function calculateGaps(assignments: PlacedCandidate[]): number {
         let gapsAvoided = 0;
         const bySectionDay = new Map<string, { start: number; end: number }[]>();
@@ -493,7 +493,7 @@ export function solveScheduleAI({
         return gapsAvoided;
     }
 
-    // Backtracking solver
+    // Explora candidatos y retrocede cuando una asignación impide completar las demás.
     function backtrack(taskIndex: number): boolean {
         if (nodosExplorados >= maxNodos || Date.now() - startTime >= maxTimeMs) {
             tiempoAgotado = true;
@@ -502,7 +502,7 @@ export function solveScheduleAI({
 
         nodosExplorados++;
 
-        // Base case: all tasks placed
+        // Si todas las sesiones se ubicaron, conserva la solución encontrada.
         if (taskIndex >= tasks.length) {
             bestSolution = [...placed];
             return true;

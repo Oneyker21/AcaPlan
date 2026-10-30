@@ -37,7 +37,7 @@ export async function exportScheduleToExcel({
         { label: '11:20 - 12:50', start: '11:20', end: '12:50' },
     ];
 
-    // Determine unique sections
+    // Combina las secciones proporcionadas con las presentes en las clases, sin repetir códigos.
     const sectionMap = new Map<string, ExportSectionInfo>();
     for (const sec of secciones) {
         sectionMap.set(sec.codigo, sec);
@@ -49,7 +49,7 @@ export async function exportScheduleToExcel({
     }
     const sortedSections = Array.from(sectionMap.values()).sort((a, b) => a.codigo.localeCompare(b.codigo));
 
-    // Build header row 1 & 2
+    // Las primeras filas identifican la institución, el turno y el semestre del archivo.
     const rows: (string | number)[][] = [];
 
     rows.push(['UNIVERSIDAD NACIONAL AUTÓNOMA DE NICARAGUA, MANAGUA (UNAN-MANAGUA)']);
@@ -66,7 +66,7 @@ export async function exportScheduleToExcel({
     }
     rows.push(headerCols);
 
-    // Build data rows for each section
+    // Cada fila corresponde a una sección y cada columna posterior a un día y bloque.
     for (const sec of sortedSections) {
         const rowData: string[] = [
             sec.codigo,
@@ -75,7 +75,7 @@ export async function exportScheduleToExcel({
 
         for (const d of days) {
             for (const b of blocksDef) {
-                // Find matching class
+                // Busca una clase de esta sección que comience en el bloque y día de la columna.
                 const match = clases.find(
                     (c) =>
                         c.seccion_codigo === sec.codigo &&

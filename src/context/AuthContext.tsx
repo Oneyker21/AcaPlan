@@ -38,6 +38,7 @@ const AuthContext = createContext<AuthContextType>({
 
 export const useAuth = () => useContext(AuthContext);
 
+// La respuesta de recuperación puede traer parámetros en la consulta o en el fragmento de la URL.
 function authRedirectParams(url: string) {
     const [withoutFragment, fragment = ''] = url.split('#', 2);
     const query = withoutFragment.split('?').slice(1).join('?');
@@ -67,6 +68,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const verifiedAuthUserId = useRef<string | null>(null);
     const authStateUpdated = useRef(false);
 
+    // El perfil activo vincula la cuenta autenticada con el rol utilizado por la aplicación.
     const loadProfile = useCallback(async (authUserId: string) => {
         console.log('[AUTH] loadProfile → Buscando perfil para auth_user_id:', authUserId);
         const { data, error } = await supabase
@@ -127,8 +129,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
         void supabase.auth.getSession().then(({ data, error }) => {
             console.log('[AUTH] getSession inicial →', error ? `❌ Error: ${error.message}` : (data.session ? `✅ Sesión existente (${data.session.user.email})` : '⚪ Sin sesión'));
-            // A login/logout event may arrive while this initial snapshot is pending.
-            // Never let an older snapshot overwrite the newer auth state.
+            // Un inicio o cierre de sesión puede ocurrir mientras se consulta la sesión inicial.
+            // Se evita que una respuesta anterior sustituya el estado más reciente.
             if (!authStateUpdated.current) {
                 if (error) setProfileError('No se pudo recuperar la sesión. Intente de nuevo.');
                 setSession(data.session);
