@@ -1,56 +1,83 @@
-# Welcome to your Expo app 👋
+# AcaPlan: aplicación móvil
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+AcaPlan es una aplicación móvil para apoyar la gestión y consulta de horarios académicos de la UNAN-Managua, CUR-Chontales. Este repositorio contiene la aplicación móvil; la PWA es un proyecto independiente.
 
-## Get started
+La aplicación está desarrollada con React Native, Expo y TypeScript. Utiliza Expo Router para la navegación y Supabase para la autenticación y el acceso a datos.
 
-1. Install dependencies
+## Generación de horarios
 
-   ```bash
+La app incluye una opción para **completar automáticamente una propuesta de horario** desde la pantalla de borradores. La pantalla solicita la generación a la función `generate_schedule_draft`, definida en la migración de Supabase `20261014000000_sprint5_generation_sharing_consultation.sql`; la búsqueda se ejecuta en la base de datos.
+
+La función busca combinaciones de bloques y aulas para las sesiones oficiales pendientes. Considera datos como docentes asignados, duración, turno, capacidad, sede y recursos del aula, además de las comprobaciones aplicadas al guardar. Conserva las sesiones ya ubicadas y devuelve las que no pudo colocar, junto con el resultado de validación.
+
+La implementación revisada realiza una búsqueda ordenada de candidatos con un límite de intentos; no se identificó en ella un modelo de IA ni OR-Tools. Puede dejar sesiones pendientes y no garantiza encontrar la mejor solución. La propuesta permanece como borrador y debe revisarse y validarse antes de compartirla o publicarla. Su funcionamiento real depende de la configuración de Supabase, los permisos y los datos disponibles; esta descripción se basa en la revisión del código, no en una prueba con datos reales.
+
+## Requisitos
+
+- Node.js y npm instalados.
+- Un dispositivo con Expo Go o un emulador compatible para ejecutar la aplicación.
+- Acceso al proyecto de Supabase que el equipo haya designado para la aplicación móvil y a sus credenciales públicas.
+
+## Instalación y configuración
+
+Desde una terminal abierta en la carpeta del proyecto móvil:
+
+1. Instala las dependencias:
+
+   ```powershell
    npm install
    ```
 
-2. Start the app
+2. Si todavía no existe el archivo `.env`, crea una copia de la plantilla:
 
-   ```bash
-   npx expo start
+   ```powershell
+   Copy-Item .env.example .env
    ```
 
-In the output, you'll find options to open the app in a
+3. Abre `.env` y completa las variables `EXPO_PUBLIC_SUPABASE_URL` y `EXPO_PUBLIC_SUPABASE_ANON_KEY` con la URL y la clave pública del proyecto Supabase correspondiente. Solicita estos datos al equipo si no los tienes.
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+Las variables `EXPO_PUBLIC_` están disponibles en la aplicación cliente. No coloques allí la clave `service_role`, claves secretas ni contraseñas. No subas el archivo `.env` al repositorio.
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+La configuración del esquema, las migraciones, la primera cuenta administradora y la función de administración se documentan en [SUPABASE_SETUP.md](SUPABASE_SETUP.md). Antes de ejecutar cualquier script, verifica con el equipo a qué proyecto de Supabase apunta y si corresponde aplicarlo; una base existente puede contener datos de otras aplicaciones.
 
-## Get a fresh project
+## Ejecutar la aplicación
 
-When you're ready, run:
-
-```bash
-npm run reset-project
+```powershell
+npm start
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+Expo mostrará las opciones disponibles para abrir la aplicación. Puedes escanear el código QR con Expo Go o utilizar un emulador configurado. El proyecto también ofrece:
 
-### Other setup steps
+```powershell
+npm run android
+npm run ios
+npm run web
+```
 
-- To set up ESLint for linting, run `npx expo lint`, or follow our guide on ["Using ESLint and Prettier"](https://docs.expo.dev/guides/using-eslint/)
-- If you'd like to set up unit testing, follow our guide on ["Unit Testing with Jest"](https://docs.expo.dev/develop/unit-testing/)
-- Learn more about the TypeScript setup in this template in our guide on ["Using TypeScript"](https://docs.expo.dev/guides/typescript/)
+La disponibilidad de cada opción depende del sistema y del entorno configurado. Algunas funciones o dependencias nativas pueden requerir una compilación de desarrollo en lugar de Expo Go.
 
-## Learn more
+## Organización del proyecto
 
-To learn more about developing your project with Expo, look at the following resources:
+- `src/app/`: rutas y pantallas de Expo Router.
+- `src/components/`: componentes y vistas utilizadas por la aplicación.
+- `src/context/`: contexto de autenticación.
+- `src/lib/`: configuración del cliente de Supabase.
+- `src/types/`: tipos utilizados por el proyecto.
+- `assets/`: imágenes y recursos visuales.
+- `supabase/`: migraciones y funciones de Supabase del proyecto móvil.
+- `paquete_postgresql_completo/`: documentación y scripts de apoyo para la base de datos.
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+## Comprobaciones
 
-## Join the community
+Para revisar el código y los tipos:
 
-Join our community of developers creating universal apps.
+```powershell
+npm run lint
+npx tsc --noEmit
+```
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+Si `npm install` muestra vulnerabilidades, consulta los detalles con `npm audit` antes de actualizar dependencias. Evita aplicar cambios incompatibles automáticamente sin revisar cómo afectan al proyecto.
+
+## Colaboración
+
+Antes de empezar, verifica que estés trabajando en la rama acordada y descarga los cambios del equipo. No compartas credenciales ni subas archivos de entorno al repositorio. Consulta con el equipo antes de modificar la configuración o ejecutar migraciones sobre una base compartida.
