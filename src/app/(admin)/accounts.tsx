@@ -138,6 +138,8 @@ export default function AccountsScreen() {
             u.correo.toLowerCase().includes(searchQuery.toLowerCase()) ||
             (u.cedula ?? '').includes(searchQuery)
     );
+    const activeUsers = usuarios.filter((user) => user.estado === 'activo').length;
+    const administratorUsers = usuarios.filter((user) => user.rol === 'administrador').length;
 
     const openCreateModal = () => {
         setEditingUser(null);
@@ -332,7 +334,27 @@ export default function AccountsScreen() {
 
     return (
         <SafeAreaView style={styles.container} edges={['bottom']}>
-            {/* Search Bar */}
+            <View style={styles.screenHeader}>
+                <Text style={styles.screenTitle}>Cuentas de usuario</Text>
+                <Text style={styles.screenSubtitle}>
+                    Administra accesos, roles y permisos de carrera.
+                </Text>
+                <View style={styles.summaryRow}>
+                    <View style={styles.summaryCard}>
+                        <Text style={styles.summaryValue}>{usuarios.length}</Text>
+                        <Text style={styles.summaryLabel}>Cuentas registradas</Text>
+                    </View>
+                    <View style={styles.summaryCard}>
+                        <Text style={styles.summaryValue}>{activeUsers}</Text>
+                        <Text style={styles.summaryLabel}>Cuentas activas</Text>
+                    </View>
+                    <View style={styles.summaryCard}>
+                        <Text style={styles.summaryValue}>{administratorUsers}</Text>
+                        <Text style={styles.summaryLabel}>Administradores</Text>
+                    </View>
+                </View>
+            </View>
+
             <View style={styles.searchContainer}>
                 <TextInput
                     style={styles.searchInput}
@@ -340,10 +362,10 @@ export default function AccountsScreen() {
                     placeholderTextColor={Colors.textTertiary}
                     value={searchQuery}
                     onChangeText={setSearchQuery}
+                    accessibilityLabel="Buscar cuentas por nombre, correo o cédula"
                 />
             </View>
 
-            {/* User List */}
             <FlatList
                 data={filteredUsuarios}
                 renderItem={renderUser}
@@ -356,13 +378,20 @@ export default function AccountsScreen() {
                 ListEmptyComponent={
                     <View style={styles.emptyContainer}>
                         <Text style={styles.emptyIcon}>👥</Text>
-                        <Text style={styles.emptyText}>No se encontraron usuarios</Text>
+                        <Text style={styles.emptyText}>
+                            {searchQuery ? 'No se encontraron cuentas con esa búsqueda' : 'No hay cuentas registradas'}
+                        </Text>
                     </View>
                 }
             />
 
-            {/* FAB */}
-            <TouchableOpacity style={styles.fab} onPress={openCreateModal} activeOpacity={0.8}>
+            <TouchableOpacity
+                style={styles.fab}
+                onPress={openCreateModal}
+                activeOpacity={0.8}
+                accessibilityRole="button"
+                accessibilityLabel="Crear cuenta"
+            >
                 <Text style={styles.fabText}>+</Text>
             </TouchableOpacity>
 
@@ -525,6 +554,43 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: Colors.background,
+    },
+    screenHeader: {
+        paddingHorizontal: Spacing.lg,
+        paddingTop: Spacing.lg,
+    },
+    screenTitle: {
+        fontSize: Typography.sizes.xl,
+        fontWeight: '700',
+        color: Colors.textPrimary,
+    },
+    screenSubtitle: {
+        fontSize: Typography.sizes.sm,
+        color: Colors.textSecondary,
+        marginTop: Spacing.xs,
+    },
+    summaryRow: {
+        flexDirection: 'row',
+        gap: Spacing.sm,
+        marginTop: Spacing.lg,
+    },
+    summaryCard: {
+        flex: 1,
+        backgroundColor: Colors.white,
+        borderRadius: BorderRadius.md,
+        borderWidth: 1,
+        borderColor: Colors.borderLight,
+        padding: Spacing.md,
+    },
+    summaryValue: {
+        fontSize: Typography.sizes.lg,
+        fontWeight: '700',
+        color: Colors.primary,
+    },
+    summaryLabel: {
+        fontSize: Typography.sizes.xs,
+        color: Colors.textSecondary,
+        marginTop: 2,
     },
     searchContainer: {
         paddingHorizontal: Spacing.lg,
