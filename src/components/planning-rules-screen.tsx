@@ -37,6 +37,7 @@ export default function PlanningRulesScreen() {
     const [refreshing, setRefreshing] = useState(false);
     const [saving, setSaving] = useState(false);
 
+    // Carga períodos, versiones de reglas y sedes para el período seleccionado.
     const fetchData = useCallback(async () => {
         const [periodResult, versionResult, sectionResult] = await Promise.all([
             supabase.from('periodos').select('id_periodo, nombre, ano_lectivo, es_activo').order('ano_lectivo', { ascending: false }),
@@ -76,6 +77,7 @@ export default function PlanningRulesScreen() {
     useEffect(() => { void fetchData(); }, [fetchData]);
 
     const hasCurAndInstitute = sites.some((row) => /cur/i.test(row.sede)) && sites.some((row) => /instituto/i.test(row.sede));
+    // Las reglas se guardan asociadas al período tras comprobar las sedes requeridas.
     const saveRules = async () => {
         if (!periodId) {
             Alert.alert('Seleccione un período', 'Las reglas se guardan en una versión asociada a un período académico.');
