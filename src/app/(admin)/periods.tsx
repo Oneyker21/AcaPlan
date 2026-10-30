@@ -41,6 +41,7 @@ export default function PeriodsScreen() {
     const [editingPeriod, setEditingPeriod] = useState<Periodo | null>(null);
     const [form, setForm] = useState<PeriodForm>(emptyForm);
     const [saving, setSaving] = useState(false);
+    const [loadError, setLoadError] = useState(false);
 
     // DateTimePicker States
     const [showInicioPicker, setShowInicioPicker] = useState(false);
@@ -79,8 +80,12 @@ export default function PeriodsScreen() {
             .select('*')
             .order('ano_lectivo', { ascending: false });
 
-        if (!error && data) {
+        if (error || !data) {
+            setLoadError(true);
+            Alert.alert('Error', 'No se pudieron cargar los períodos académicos. Deslice para volver a intentar.');
+        } else {
             setPeriodos(data as Periodo[]);
+            setLoadError(false);
         }
         setLoading(false);
         setRefreshing(false);
@@ -94,6 +99,7 @@ export default function PeriodsScreen() {
         setRefreshing(true);
         fetchPeriodos();
     };
+    const activePeriod = periodos.find((period) => period.es_activo);
 
     const openCreateModal = () => {
         setEditingPeriod(null);
@@ -282,16 +288,75 @@ export default function PeriodsScreen() {
                 refreshControl={
                     <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
                 }
+                ListHeaderComponent={
+                    <View style={styles.listHeader}>
+                        <Text style={styles.screenTitle}>Períodos académicos</Text>
+                        <Text style={styles.screenSubtitle}>
+                            Define el calendario y selecciona el período vigente para la planificación.
+                        </Text>
+
+                        <View style={styles.activePeriodCard}>
+                            <View style={styles.activePeriodIcon}>
+                                <Text style={styles.activePeriodIconText}>📅</Text>
+                            </View>
+                            <View style={styles.activePeriodCopy}>
+                                <Text style={styles.activePeriodLabel}>PERÍODO ACTIVO</Text>
+                                <Text style={styles.activePeriodName}>
+                                    {activePeriod
+                                        ? `${activePeriod.nombre} ${activePeriod.ano_lectivo}`
+                                        : 'Sin período activo'}
+                                </Text>
+                                <Text style={styles.activePeriodDates}>
+                                    {activePeriod
+                                        ? `${activePeriod.fecha_inicio} — ${activePeriod.fecha_fin}`
+                                        : 'Activa un período para establecer el ciclo vigente.'}
+                                </Text>
+                            </View>
+                            <View
+                                style={[
+                                    styles.activePeriodDot,
+                                    !activePeriod && styles.inactivePeriodDot,
+                                ]}
+                            />
+                        </View>
+
+                        <View style={styles.periodSummaryRow}>
+                            <View style={styles.periodSummaryCard}>
+                                <Text style={styles.periodSummaryValue}>{periodos.length}</Text>
+                                <Text style={styles.periodSummaryLabel}>Períodos registrados</Text>
+                            </View>
+                            <View style={styles.periodSummaryCard}>
+                                <Text style={styles.periodSummaryValue}>{activePeriod ? '1' : '0'}</Text>
+                                <Text style={styles.periodSummaryLabel}>Período vigente</Text>
+                            </View>
+                        </View>
+                        {loadError && (
+                            <Text style={styles.loadError}>
+                                No se pudo actualizar la lista. Deslice hacia abajo para reintentar.
+                            </Text>
+                        )}
+                    </View>
+                }
                 ListEmptyComponent={
                     <View style={styles.emptyContainer}>
                         <Text style={styles.emptyIcon}>📅</Text>
-                        <Text style={styles.emptyText}>No hay períodos registrados</Text>
-                        <Text style={styles.emptySubtext}>Agrega el primer período académico</Text>
+                        <Text style={styles.emptyText}>
+                            {loadError ? 'No se pudieron cargar los períodos' : 'No hay períodos registrados'}
+                        </Text>
+                        <Text style={styles.emptySubtext}>
+                            {loadError ? 'Deslice hacia abajo para volver a intentar' : 'Agrega el primer período académico'}
+                        </Text>
                     </View>
                 }
             />
 
-            <TouchableOpacity style={styles.fab} onPress={openCreateModal} activeOpacity={0.8}>
+            <TouchableOpacity
+                style={styles.fab}
+                onPress={openCreateModal}
+                activeOpacity={0.8}
+                accessibilityRole="button"
+                accessibilityLabel="Crear período académico"
+            >
                 <Text style={styles.fabText}>+</Text>
             </TouchableOpacity>
 
@@ -411,6 +476,99 @@ const styles = StyleSheet.create({
     listContent: {
         padding: Spacing.lg,
         paddingBottom: 100,
+    },
+    listHeader: {
+        marginBottom: Spacing.lg,
+    },
+    screenTitle: {
+        fontSize: Typography.sizes.xl,
+        fontWeight: '700',
+        color: Colors.textPrimary,
+    },
+    screenSubtitle: {
+        fontSize: Typography.sizes.sm,
+        lineHeight: 19,
+        color: Colors.textSecondary,
+        marginTop: Spacing.xs,
+        marginBottom: Spacing.lg,
+    },
+    activePeriodCard: {
+        backgroundColor: Colors.primary,
+        borderRadius: BorderRadius.lg,
+        padding: Spacing.lg,
+        flexDirection: 'row',
+        alignItems: 'center',
+        ...Shadows.md,
+    },
+    activePeriodIcon: {
+        width: 44,
+        height: 44,
+        borderRadius: BorderRadius.md,
+        backgroundColor: 'rgba(255,255,255,0.16)',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginRight: Spacing.md,
+    },
+    activePeriodIconText: {
+        fontSize: 22,
+    },
+    activePeriodCopy: {
+        flex: 1,
+    },
+    activePeriodLabel: {
+        fontSize: Typography.sizes.xs,
+        fontWeight: '700',
+        letterSpacing: 0.7,
+        color: Colors.accentLight,
+    },
+    activePeriodName: {
+        fontSize: Typography.sizes.md,
+        fontWeight: '700',
+        color: Colors.white,
+        marginTop: 3,
+    },
+    activePeriodDates: {
+        fontSize: Typography.sizes.xs,
+        color: 'rgba(255,255,255,0.75)',
+        marginTop: 3,
+    },
+    activePeriodDot: {
+        width: 10,
+        height: 10,
+        borderRadius: 5,
+        backgroundColor: Colors.success,
+        marginLeft: Spacing.sm,
+    },
+    inactivePeriodDot: {
+        backgroundColor: Colors.warning,
+    },
+    periodSummaryRow: {
+        flexDirection: 'row',
+        gap: Spacing.md,
+        marginTop: Spacing.md,
+    },
+    periodSummaryCard: {
+        flex: 1,
+        backgroundColor: Colors.white,
+        borderRadius: BorderRadius.md,
+        borderWidth: 1,
+        borderColor: Colors.borderLight,
+        padding: Spacing.md,
+    },
+    periodSummaryValue: {
+        fontSize: Typography.sizes.lg,
+        fontWeight: '700',
+        color: Colors.primary,
+    },
+    periodSummaryLabel: {
+        fontSize: Typography.sizes.xs,
+        color: Colors.textSecondary,
+        marginTop: 2,
+    },
+    loadError: {
+        color: Colors.error,
+        fontSize: Typography.sizes.sm,
+        marginTop: Spacing.md,
     },
     periodCard: {
         backgroundColor: Colors.white,
