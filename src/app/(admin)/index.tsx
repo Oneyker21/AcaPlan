@@ -160,7 +160,7 @@ export default function AdminDashboard() {
                         <View style={styles.actionsContainer}>
                             {group.actions.map((action) => (
                                 <TouchableOpacity
-                                    key={action.href}
+                                    key={action.title}
                                     accessibilityRole="button"
                                     accessibilityLabel={`${action.title}. ${action.description}`}
                                     style={styles.actionCard}

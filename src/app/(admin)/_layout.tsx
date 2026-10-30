@@ -28,6 +28,7 @@ export default function AdminLayout() {
                 headerTitleStyle: {
                     fontWeight: '600',
                 },
+                headerRight: () => <HeaderLogoutButton />,
             }}
         >
             <Tabs.Screen
@@ -35,7 +36,6 @@ export default function AdminLayout() {
                 options={{
                     title: 'Inicio',
                     headerTitle: 'AcaPlan · Admin',
-                    headerRight: () => <HeaderLogoutButton />,
                     tabBarIcon: ({ color }) => <Text style={{ fontSize: 20, color }}>🏠</Text>,
                 }}
             />

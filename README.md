@@ -12,6 +12,13 @@ La aplicación dispone de dos caminos de generación de propuestas:
 - **Completar un borrador:** desde la pantalla de borradores se llama a `generate_schedule_draft`, función definida en la migración `20261014000000_sprint5_generation_sharing_consultation.sql`. Esta función de Supabase busca ubicaciones para sesiones pendientes, conserva las sesiones ya colocadas y devuelve las que no pudo ubicar y el resultado de validación.
 
 Ambos caminos dependen de la configuración, los permisos y los datos académicos disponibles. Las propuestas deben revisarse antes de compartirlas o publicarlas. Esta descripción proviene de la revisión del código; no equivale a una prueba con datos reales.
+
+## Administración
+
+El panel de inicio agrupa los accesos administrativos por gestión institucional, planificación académica y cuenta. Desde allí están disponibles las rutas de cuentas, períodos, departamentos, catálogos, inventario de espacios, bloques, secciones, asignaciones, importaciones, planificación, generación y consulta de horarios, además del perfil.
+
+Las pestañas inferiores mantienen acceso directo a Inicio, Cuentas, Períodos, Secciones y Perfil. El resto de las herramientas se abre desde las tarjetas del panel. La lista central de rutas y sus descripciones se mantiene en `src/constants/admin-navigation.ts`.
+
 ## Requisitos
 
 - Node.js y npm instalados.
@@ -81,4 +88,3 @@ Si `npm install` muestra vulnerabilidades, consulta los detalles con `npm audit`
 ## Colaboración
 
 Antes de empezar, verifica que estés trabajando en la rama acordada y descarga los cambios del equipo. No compartas credenciales ni subas archivos de entorno al repositorio. Consulta con el equipo antes de modificar la configuración o ejecutar migraciones sobre una base compartida.
-
