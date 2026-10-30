@@ -198,10 +198,12 @@ export default function AcademicAssignmentImportScreen() {
         return rows;
     }, [groupsForPeriod, includedSheets, mappings, periodId, resources, subjectLinks, subjects, teachers, sheets]);
 
+    // Solo las hojas seleccionadas participan en la vista previa y la importación.
     const selectedRows = previewRows.filter((row) => includedSheets[row.sheet]);
     const errorCount = selectedRows.reduce((total, row) => total + row.errors.length, 0);
     const canImport = selectedRows.length > 0 && errorCount === 0 && !saving && !reading;
 
+    // Intenta reconocer columnas por sus nombres alternativos; se pueden ajustar después.
     const autoMap = (headers: string[]): Mapping => {
         const result: Mapping = {};
         fields.forEach((field) => {
@@ -211,6 +213,7 @@ export default function AcademicAssignmentImportScreen() {
         return result;
     };
 
+    // Lee las hojas del archivo y toma su primera fila no vacía como encabezado.
     const chooseFile = async () => {
         if (!periodId) {
             Alert.alert('Seleccione período', 'Seleccione primero el período académico al que pertenecen los grupos.');
@@ -279,6 +282,7 @@ export default function AcademicAssignmentImportScreen() {
     const handleImport = async () => {
         if (!canImport) return;
         setSaving(true);
+        // Envía los identificadores y datos de las filas validadas a la función de importación.
         const payload = selectedRows.map((row) => ({
             sheet: row.sheet,
             row: row.row,
